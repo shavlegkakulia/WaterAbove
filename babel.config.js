@@ -1,6 +1,7 @@
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
+    '@babel/plugin-transform-export-namespace-from',
     [
       'module-resolver',
       {
@@ -10,10 +11,12 @@ module.exports = {
           '@': './src',
           '@api': './src/api',
           '@components': './src/components',
+          '@config': './src/config',
           '@navigation': './src/navigation',
           '@screens': './src/screens',
           '@store': './src/store',
           '@theme': './src/theme',
+          '@validation': './src/validation',
         },
       },
     ],

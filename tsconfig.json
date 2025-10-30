@@ -7,10 +7,12 @@
       "@/*": ["src/*"],
       "@api/*": ["src/api/*"],
       "@components/*": ["src/components/*"],
+      "@config/*": ["src/config/*"],
       "@navigation/*": ["src/navigation/*"],
       "@screens/*": ["src/screens/*"],
       "@store/*": ["src/store/*"],
-      "@theme/*": ["src/theme/*"]
+      "@theme/*": ["src/theme/*"],
+      "@validation/*": ["src/validation/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
