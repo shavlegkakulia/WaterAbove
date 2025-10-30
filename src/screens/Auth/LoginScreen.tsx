@@ -11,36 +11,41 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {colors, spacing, borderRadius} from '@/theme';
-import {Logo, Button, Text, FormInput, FormCheckbox} from '@/components';
+import {Logo, Button, Text, FormInput, Icon} from '@/components';
+import {useRoute} from '@react-navigation/native';
+import type {RouteProp} from '@react-navigation/native';
+import type {RootStackParamList} from '@/navigation/types';
 import {useAuth, useToast} from '@/store/hooks';
 import {loginSchema, type LoginFormData} from '@/validation';
 
-// Mock icons - replace with react-native-vector-icons
 const EnvelopeIcon = () => (
   <View style={styles.iconPlaceholder}>
-    <Text variant="body" color="white">✉️</Text>
+    <Icon name="Mail" size={18} color="#ffffff" />
   </View>
 );
 
 const LockIcon = () => (
   <View style={styles.iconPlaceholder}>
-    <Text variant="body" color="white">🔒</Text>
+    <Icon name="Lock" size={18} color="#ffffff" />
   </View>
 );
 
 export const LoginScreen: React.FC = () => {
+  const route = useRoute<RouteProp<RootStackParamList, 'Login'>>();
+  const prefillEmail = route.params?.email || '';
+  const fromAlreadyVerified = route.params?.alreadyVerified === true;
   const {login, isLoading} = useAuth();
   const {showSuccess, showError} = useToast();
   
   const {
     control,
     handleSubmit,
-    formState: {errors, isValid},
+    formState: {isValid},
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onChange', // Validate on change
     defaultValues: {
-      email: '',
+      email: prefillEmail,
       password: '',
     },
   });
@@ -84,13 +89,13 @@ export const LoginScreen: React.FC = () => {
                   variant="heading2"
                   color="textPrimary"
                   style={styles.title}>
-                  Welcome Back
+                  {fromAlreadyVerified ? 'Email already verified' : 'Welcome Back'}
                 </Text>
                 <Text
                   variant="body"
                   color="textSecondary"
                   style={styles.subtitle}>
-                  Sign in to your account
+                  {fromAlreadyVerified ? 'Login to continue.' : 'Sign in to your account'}
                 </Text>
 
                 {/* Email Input */}

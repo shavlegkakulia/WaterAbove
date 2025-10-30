@@ -67,7 +67,26 @@ export interface VerifyEmailRequest {
 
 export interface VerifyEmailResponse {
   success: boolean;
-  message: string;
+  data?: Record<string, any> | null;
+  error?: string;
+}
+
+export interface VerifyEmailCodeRequest {
+  email: string;
+  code: string;
+}
+
+// Auth status
+export interface AuthStatusResponse {
+  success: boolean;
+  data?: {
+    authenticated: boolean;
+    user?: User | null;
+    accessToken?: string;
+    refreshToken?: string;
+    message?: string;
+  } | null;
+  error?: string;
 }
 
 export interface ForgotPasswordRequest {

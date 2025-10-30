@@ -7,8 +7,10 @@ import type {
   RegisterResponse,
   VerifyEmailRequest,
   VerifyEmailResponse,
+  VerifyEmailCodeRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  AuthStatusResponse,
 } from '../types';
 
 /**
@@ -50,10 +52,26 @@ export const authService = {
   },
 
   /**
+   * Check auth status using existing token
+   */
+  getStatus: async (): Promise<AuthStatusResponse> => {
+    const response = await apiClient.get(API_ENDPOINTS.AUTH.STATUS);
+    return response.data;
+  },
+
+  /**
    * Verify email address
    */
   verifyEmail: async (data: VerifyEmailRequest): Promise<VerifyEmailResponse> => {
     const response = await apiClient.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL, data);
+    return response.data;
+  },
+
+  /**
+   * Verify email with code (confirm)
+   */
+  verifyEmailCode: async (data: VerifyEmailCodeRequest): Promise<VerifyEmailResponse> => {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL_CODE, data);
     return response.data;
   },
 

@@ -9,20 +9,23 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {colors, spacing, borderRadius} from '@/theme';
-import {Logo, Button, Text, FormInput} from '@/components';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {RootStackParamList} from '@/navigation/types';
+import {Logo, Button, Text, FormInput, Icon} from '@/components';
 import {useEmailVerification, useToast} from '@/store/hooks';
 import {emailSchema, type EmailFormData} from '@/validation';
 
-// Mock icon component - replace with react-native-vector-icons
 const EnvelopeIcon = () => (
   <View style={styles.iconPlaceholder}>
-    <Text variant="body" color="white">✉️</Text>
+    <Icon name="Mail" size={18} color="#ffffff" />
   </View>
 );
 
 export const VerificationScreen: React.FC = () => {
   const {isVerifying, verifyEmail} = useEmailVerification();
   const {showSuccess, showError} = useToast();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   
   const {
     control,
@@ -38,16 +41,26 @@ export const VerificationScreen: React.FC = () => {
     const result = await verifyEmail(data.email);
     
     if (result.success) {
-      showSuccess('Verification email sent! Please check your inbox.');
+      if ((result as any).alreadyVerified) {
+        navigation.navigate('Login', {
+          email: (result as any).user?.email || data.email,
+          alreadyVerified: true,
+        });
+        return;
+      }
+      // Navigate to code entry screen
+      navigation.navigate('EmailCode', {email: data.email});
+      showSuccess('Verification email sent!');
     } else {
       showError(result.error || 'Verification failed. Please try again.');
     }
   };
 
   const handleBackToLogin = () => {
-    // Navigate to login screen
-    console.log('Back to login');
+    navigation.navigate('Login');
   };
+
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>

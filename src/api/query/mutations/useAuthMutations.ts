@@ -11,6 +11,7 @@ import type {
   LoginRequest,
   RegisterRequest,
   VerifyEmailRequest,
+  VerifyEmailCodeRequest,
 } from '@/api/types';
 
 /**
@@ -154,6 +155,15 @@ export const useResetPasswordMutation = () => {
   return useMutation({
     mutationFn: (data: {code: string; newPassword: string}) =>
       authService.resetPassword(data),
+  });
+};
+
+/**
+ * Verify Email Code Mutation (confirm verification)
+ */
+export const useVerifyEmailCodeMutation = () => {
+  return useMutation({
+    mutationFn: (data: VerifyEmailCodeRequest) => authService.verifyEmailCode(data),
   });
 };
 

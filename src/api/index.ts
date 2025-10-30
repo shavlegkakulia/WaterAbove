@@ -13,4 +13,5 @@ export * from './types';
 
 // Re-export commonly used
 export {apiClient as default} from './client';
+export {setAuthToken} from './client';
 

@@ -1,5 +1,6 @@
 import {atom} from 'jotai';
-import {atomWithStorage} from 'jotai/utils';
+import {atomWithStorage, createJSONStorage} from 'jotai/utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // User state
 export interface User {
@@ -12,18 +13,19 @@ export interface User {
 // Auth state atoms
 export const userAtom = atom<User | null>(null);
 export const isAuthenticatedAtom = atom<boolean>(false);
-export const isLoadingAuthAtom = atom<boolean>(false);
 
-// Persisted auth token
-export const authTokenAtom = atomWithStorage<string | null>('auth_token', null);
+// Persisted auth token (React Native AsyncStorage)
+export const authTokenAtom = atomWithStorage<string | null>(
+  'auth_token',
+  null,
+  createJSONStorage(() => AsyncStorage)
+);
 
 // Derived atom - check if user is logged in
 export const isLoggedInAtom = atom(
   (get) => get(isAuthenticatedAtom) && get(userAtom) !== null
 );
 
-// Email verification state
+// Email verification state - stores the email that successfully requested verification
 export const verificationEmailAtom = atom<string>('');
-export const isVerifyingEmailAtom = atom<boolean>(false);
-export const verificationErrorAtom = atom<string | null>(null);
 

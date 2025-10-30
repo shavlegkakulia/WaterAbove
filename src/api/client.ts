@@ -7,14 +7,7 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 // Get base URL from environment
 const baseURL = env.API_BASE_URL;
 
-// Optional: Basic auth credentials (if provided)
-const basicAuth = env.API_USERNAME && env.API_PASSWORD
-  ? {
-      Authorization: `Basic ${btoa(
-        `${env.API_USERNAME}:${env.API_PASSWORD}`
-      )}`,
-    }
-  : {};
+// Authorization is handled exclusively via Bearer tokens set by setAuthToken
 
 // Platform-specific params
 const platformParams = Platform.select({
@@ -30,11 +23,10 @@ export const apiClient = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
-    ...basicAuth,
   },
   params: platformParams,
   timeout: 15000, // 15 seconds
-  validateStatus: (status) => status < 500, // Don't throw on 4xx errors
+  validateStatus: (status) => status < 405, // Don't throw on 4xx errors
 });
 
 /**
@@ -139,42 +131,5 @@ apiClient.interceptors.response.use(
   }
 );
 
-/**
- * Helper function for Base64 encoding (React Native compatible)
- */
-function btoa(str: string): string {
-  // Use globalThis btoa if available (modern React Native)
-  if (typeof (globalThis as any).btoa === 'function') {
-    return (globalThis as any).btoa(str);
-  }
-  
-  // Fallback: manual base64 encoding
-  /* eslint-disable no-bitwise */
-  const base64Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-  let output = '';
-  let i = 0;
-  
-  while (i < str.length) {
-    const char1 = str.charCodeAt(i++);
-    const char2 = i < str.length ? str.charCodeAt(i++) : Number.NaN;
-    const char3 = i < str.length ? str.charCodeAt(i++) : Number.NaN;
-    
-    const enc1 = char1 >> 2;
-    const enc2 = ((char1 & 3) << 4) | (char2 >> 4);
-    let enc3 = ((char2 & 15) << 2) | (char3 >> 6);
-    let enc4 = char3 & 63;
-    
-    if (isNaN(char2)) {
-      enc3 = enc4 = 64;
-    } else if (isNaN(char3)) {
-      enc4 = 64;
-    }
-    
-    output += base64Chars.charAt(enc1) + base64Chars.charAt(enc2) +
-              base64Chars.charAt(enc3) + base64Chars.charAt(enc4);
-  }
-  /* eslint-enable no-bitwise */
-  
-  return output;
-}
+// Removed Basic auth support; Base64 helper no longer needed
 
