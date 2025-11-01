@@ -1,22 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { spacing } from '@/theme';
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {colors, spacing, borderRadius} from '@/theme';
-import {Logo, Button, Text, FormInput, Icon} from '@/components';
-import {useRoute} from '@react-navigation/native';
-import type {RouteProp} from '@react-navigation/native';
-import type {RootStackParamList} from '@/navigation/types';
-import {useAuth, useToast} from '@/store/hooks';
-import {loginSchema, type LoginFormData} from '@/validation';
+  Logo,
+  Button,
+  Text,
+  FormInput,
+  Checkbox,
+  Icon,
+  FormCard,
+  LinkLabel,
+  AuthScreenWrapper,
+  Divider,
+  PasswordVisibilityToggle,
+} from '@/components';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '@/navigation/types';
+import { useAuth, useToast } from '@/store/hooks';
+import { loginSchema, type LoginFormData } from '@/validation';
+import { moderateScale } from '@/utils';
 
 const EnvelopeIcon = () => (
   <View style={styles.iconPlaceholder}>
@@ -32,15 +38,19 @@ const LockIcon = () => (
 
 export const LoginScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'Login'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const prefillEmail = route.params?.email || '';
   const fromAlreadyVerified = route.params?.alreadyVerified === true;
-  const {login, isLoading} = useAuth();
-  const {showSuccess, showError} = useToast();
-  
+  const hideCreate = route.params?.hideCreate === true;
+  const { login, isLoading } = useAuth();
+  const { showSuccess, showError } = useToast();
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     control,
     handleSubmit,
-    formState: {isValid},
+    formState: { isValid },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onChange', // Validate on change
@@ -52,7 +62,7 @@ export const LoginScreen: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     const result = await login(data.email, data.password);
-    
+
     if (result.success) {
       showSuccess('Welcome back!');
       // Navigation will be handled by auth state change
@@ -65,189 +75,134 @@ export const LoginScreen: React.FC = () => {
     console.log('Navigate to forgot password');
   };
 
-  const handleSignUp = () => {
-    console.log('Navigate to sign up');
+  const handleCreateAccount = () => {
+    navigation.navigate('Verification');
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}>
-        <View style={styles.background}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled">
-            <View style={styles.container}>
-              <View style={styles.card}>
-                {/* Logo */}
-                <Logo size={100} containerStyle={styles.logo} />
+    <AuthScreenWrapper>
+      <FormCard>
+        {/* Logo */}
+        <Logo size={moderateScale(100)} containerStyle={styles.logo} />
 
-                {/* Title */}
-                <Text
-                  variant="heading2"
-                  color="textPrimary"
-                  style={styles.title}>
-                  {fromAlreadyVerified ? 'Email already verified' : 'Welcome Back'}
-                </Text>
-                <Text
-                  variant="body"
-                  color="textSecondary"
-                  style={styles.subtitle}>
-                  {fromAlreadyVerified ? 'Login to continue.' : 'Sign in to your account'}
-                </Text>
+        {/* Title */}
+        <Text variant="heading28Bold" color="textWhiteWA" style={styles.title}>
+          {fromAlreadyVerified ? 'Email already verified' : 'Login or create an account to get Started!'}
+        </Text>
 
-                {/* Email Input */}
-                <FormInput
-                  control={control}
-                  name="email"
-                  placeholder="Enter your email"
-                  label="Email"
-                  leftIcon={<EnvelopeIcon />}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  containerStyle={styles.input}
-                />
+        {/* Email Input */}
+        <FormInput
+          control={control}
+          name="email"
+          placeholder="Enter your email"
+          leftIcon={<EnvelopeIcon />}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          containerStyle={styles.input}
+        />
 
-                {/* Password Input */}
-                <FormInput
-                  control={control}
-                  name="password"
-                  placeholder="Enter your password"
-                  label="Password"
-                  leftIcon={<LockIcon />}
-                  secureTextEntry
-                  containerStyle={styles.input}
-                />
+        {/* Password Input */}
+        <FormInput
+          control={control}
+          name="password"
+          placeholder="Enter your password"
+          leftIcon={<LockIcon />}
+          secureTextEntry={!showPassword}
+          rightIcon={
+            <PasswordVisibilityToggle
+              visible={showPassword}
+              onToggle={() => setShowPassword(!showPassword)}
+            />
+          }
+          containerStyle={styles.input}
+        />
 
-                {/* Forgot Password */}
-                <TouchableOpacity
-                  onPress={handleForgotPassword}
-                  style={styles.forgotPassword}>
-                  <Text variant="body" color="info">
-                    Forgot Password?
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Login Button */}
-                <Button
-                  title="Sign In"
-                  variant="primary"
-                  size="large"
-                  loading={isLoading}
-                  disabled={isLoading || !isValid}
-                  onPress={handleSubmit(onSubmit)}
-                  containerStyle={styles.loginButton}
-                />
-
-                {/* Divider */}
-                <View style={styles.divider}>
-                  <View style={styles.dividerLine} />
-                  <Text variant="caption" color="textSecondary" style={styles.dividerText}>
-                    OR
-                  </Text>
-                  <View style={styles.dividerLine} />
-                </View>
-
-                {/* Sign Up */}
-                <TouchableOpacity
-                  onPress={handleSignUp}
-                  style={styles.signUpButton}>
-                  <Text variant="body" color="textSecondary">
-                    Don't have an account?{' '}
-                    <Text variant="bodyBold" color="primary">
-                      Sign Up
-                    </Text>
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </ScrollView>
+        {/* Remember Me and Forgot Password */}
+        <View style={styles.checkboxRow}>
+          <Checkbox
+            checked={rememberMe}
+            onPress={() => setRememberMe(!rememberMe)}
+            label="Remember Me"
+            containerStyle={styles.checkboxContainer}
+            labelStyle={styles.checkboxLabel}
+          />
+          <LinkLabel onPress={handleForgotPassword} textVariant="caption12Regular" underline>
+            Forgot password?
+          </LinkLabel>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        {/* Login Button */}
+        <Button
+          title="Login"
+          variant="primary"
+          size="small"
+          loading={isLoading}
+          disabled={isLoading || !isValid}
+          onPress={handleSubmit(onSubmit)}
+          containerStyle={styles.loginButton}
+        />
+
+        {/* Divider and Create Account Section */}
+        {!hideCreate && (
+          <>
+            <Divider />
+            <View style={styles.createAccountContainer}>
+              <Text variant="body16Bold" color="textWhiteWA">
+                New here?{' '}
+              </Text>
+              <LinkLabel onPress={handleCreateAccount} textVariant="body16Bold" underline>
+                Create an account
+              </LinkLabel>
+            </View>
+          </>
+        )}
+      </FormCard>
+    </AuthScreenWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.backgroundDark,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  background: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingVertical: spacing.xl,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: colors.backgroundCard,
-    borderRadius: borderRadius.xxl,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    padding: spacing.xl,
-    alignItems: 'center',
-  },
   logo: {
-    marginBottom: spacing.lg,
+    marginTop: moderateScale(56),
+    marginBottom: moderateScale(36),
   },
   title: {
     textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    textAlign: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: moderateScale(36),
   },
   input: {
     width: '100%',
-    marginBottom: spacing.md,
+    marginBottom: moderateScale(25),
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: spacing.lg,
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: moderateScale(spacing.xl),
+    flex: 1,
+  },
+  checkboxContainer: {
+    alignItems: 'center',
+  },
+  checkboxLabel: {
+    marginTop: 0,
   },
   loginButton: {
     width: '100%',
-    marginBottom: spacing.lg,
+    marginBottom: moderateScale(36),
   },
-  divider: {
+  createAccountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    marginBottom: spacing.lg,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.gray700,
-  },
-  dividerText: {
-    marginHorizontal: spacing.md,
-  },
-  signUpButton: {
-    paddingVertical: spacing.sm,
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    marginTop: moderateScale(25),
+    marginBottom: moderateScale(56),
   },
   iconPlaceholder: {
-    width: 24,
-    height: 24,
+    width: moderateScale(24),
+    height: moderateScale(24),
     alignItems: 'center',
     justifyContent: 'center',
   },
 });
-

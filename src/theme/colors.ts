@@ -51,13 +51,14 @@ export const colors = {
   backgroundLight: '#F9FAFB',
   backgroundDark: '#0F172A',
   backgroundCard: '#1E293B',
-  backgroundInput: '#363A4F',
+  backgroundInput: '#2F3847',
 
   // Text Colors
   textPrimary: '#FFFFFF',
   textSecondary: '#9CA3AF',
   textDisabled: '#6B7280',
   textDark: '#000000',
+  textWhiteWA: '#D6E7E3', // White-WA from design
 
   // Border Colors
   border: '#E5E7EB',
@@ -73,6 +74,10 @@ export const colors = {
   overlay: 'rgba(0, 0, 0, 0.5)',
   overlayLight: 'rgba(0, 0, 0, 0.3)',
   overlayDark: 'rgba(0, 0, 0, 0.7)',
+  
+  // White overlays
+  whiteOverlay3: 'rgba(255, 255, 255, 0.03)',
+  whiteOverlay4: 'rgba(255, 255, 255, 0.04)',
 } as const;
 
 export type ColorKey = keyof typeof colors;

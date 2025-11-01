@@ -6,8 +6,9 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import {colors, spacing, borderRadius} from '@/theme';
+import {colors, spacing, borderRadius, TypographyKey} from '@/theme';
 import {Text} from '@/components/Typography';
+import { moderateScale } from '@/utils';
 
 export interface CheckboxProps {
   checked: boolean;
@@ -17,6 +18,7 @@ export interface CheckboxProps {
   containerStyle?: ViewStyle;
   checkboxStyle?: ViewStyle;
   labelStyle?: TextStyle;
+  variant?: TypographyKey;
 }
 
 export const Checkbox: React.FC<CheckboxProps> = ({
@@ -27,6 +29,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   containerStyle,
   checkboxStyle,
   labelStyle,
+  variant = 'caption12Regular', // default variant  
 }) => {
   return (
     <TouchableOpacity
@@ -45,7 +48,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       </View>
       {label && (
         <Text
-          variant="paragraphSmallDefault"
+          variant={variant}
           color="textPrimary"
           style={[styles.label, disabled && {color: colors.textDisabled}, labelStyle]}>
           {label}
@@ -58,31 +61,31 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    flex: 1,
   },
   checkbox: {
-    width: 24,
-    height: 24,
+    width: moderateScale(16),
+    height: moderateScale(16),
     borderRadius: borderRadius.sm,
     borderWidth: 2,
     borderColor: colors.white,
     backgroundColor: colors.transparent,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
+    marginRight: moderateScale(spacing.sm),
   },
   checkboxChecked: {
     backgroundColor: colors.white,
     borderColor: colors.white,
   },
   checkmark: {
-    width: 14,
-    height: 10,
-    borderLeftWidth: 3,
-    borderBottomWidth: 3,
+    width: 10,
+    height: 6,
+    borderLeftWidth: 2,
+    borderBottomWidth: 2,
     borderColor: colors.accent,
     transform: [{rotate: '-45deg'}],
-    marginTop: -2,
+    marginTop: -1,
   },
   label: {
     flex: 1,

@@ -116,3 +116,23 @@ export const resetPasswordSchema = z
 
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
+// Password setup schema (after email verification)
+export const passwordSetupSchema = z
+  .object({
+    password: z
+      .string()
+      .min(1, 'Password is required')
+      .min(8, 'Password must be at least 8 characters')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/,
+        'Password must contain at least 8 characters, with a mix of upper/lowercase letters, a number, and a special character'
+      ),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+export type PasswordSetupFormData = z.infer<typeof passwordSetupSchema>;
+

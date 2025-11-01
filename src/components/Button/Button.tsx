@@ -6,9 +6,9 @@ import {
   TouchableOpacityProps,
   ActivityIndicator,
 } from 'react-native';
-import {colors, spacing, borderRadius, shadows} from '@/theme';
+import {colors, spacing, shadows, borderRadius} from '@/theme';
 import {Text} from '@/components/Typography';
-
+import { moderateScale } from '@/utils';
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 export type ButtonSize = 'small' | 'medium' | 'large';
 export type ButtonShape = 'pill' | 'circular';
@@ -48,31 +48,18 @@ export const Button: React.FC<ButtonProps> = ({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: shape === 'circular' ? borderRadius.full : borderRadius.xl,
+      paddingVertical: moderateScale(spacing.sm),
+      paddingHorizontal: moderateScale(spacing.lg),
+      borderRadius: moderateScale(borderRadius.xxl),
+      minHeight: moderateScale(spacing.xxl),
     };
-
-    // Size
-    if (shape === 'circular') {
-      const circularSizes = {
-        small: {width: 40, height: 40},
-        medium: {width: 56, height: 56},
-        large: {width: 64, height: 64},
-      };
-      Object.assign(baseStyle, circularSizes[size]);
-    } else {
-      const pillSizes = {
-        small: {paddingHorizontal: spacing.md, minHeight: 40},
-        medium: {paddingHorizontal: spacing.lg, minHeight: 56},
-        large: {paddingHorizontal: spacing.xl, minHeight: 64},
-      };
-      Object.assign(baseStyle, pillSizes[size]);
-    }
 
     // Variant colors
     if (isDisabled) {
-      baseStyle.backgroundColor = colors.gray700;
+      baseStyle.backgroundColor = '#000';
+      baseStyle.opacity = 0.5;
     } else if (variant === 'primary') {
-      baseStyle.backgroundColor = colors.white;
+      baseStyle.backgroundColor = '#D6E7E3';
     } else if (variant === 'secondary') {
       baseStyle.backgroundColor = colors.primary;
     } else if (variant === 'outline') {
@@ -87,8 +74,8 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const getTextColor = () => {
-    if (isDisabled) return colors.textDisabled;
-    if (variant === 'primary') return colors.textDark;
+    if (isDisabled) return '#F1F1F1';
+    if (variant === 'primary') return '#171B22';
     if (variant === 'secondary') return colors.white;
     return colors.white;
   };
@@ -118,7 +105,7 @@ export const Button: React.FC<ButtonProps> = ({
           {leftIcon && <>{leftIcon}</>}
           {title && shape !== 'circular' && (
             <Text
-              variant={size === 'small' ? 'buttonSmall' : 'button'}
+              variant={size === 'small' ? 'button14Semibold' : 'button16Semibold'}
               style={[
                 {color: getTextColor()},
                 leftIcon ? {marginLeft: spacing.sm} : undefined,

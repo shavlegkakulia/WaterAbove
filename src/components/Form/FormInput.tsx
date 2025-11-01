@@ -7,12 +7,14 @@ export interface FormInputProps<T extends FieldValues>
   control: Control<T>;
   name: Path<T>;
   rules?: any;
+  onChangeTextFilter?: (text: string) => string;
 }
 
 export function FormInput<T extends FieldValues>({
   control,
   name,
   rules,
+  onChangeTextFilter,
   ...inputProps
 }: FormInputProps<T>) {
   return (
@@ -20,16 +22,34 @@ export function FormInput<T extends FieldValues>({
       control={control}
       name={name}
       rules={rules}
-      render={({field: {onChange, onBlur, value}, fieldState: {error}}) => (
-        <Input
-          {...inputProps}
-          value={value || ''}
-          onChangeText={onChange}
-          onBlur={onBlur}
-          state={error ? 'error' : 'default'}
-          helpText={error?.message}
-        />
-      )}
+      render={({field: {onChange, onBlur, value}, fieldState: {error, isDirty, isTouched}}) => {
+        const handleChangeText = (text: string) => {
+          const filteredText = onChangeTextFilter ? onChangeTextFilter(text) : text;
+          onChange(filteredText);
+        };
+
+        // Determine state: success if valid (no error), not empty, and has been touched/changed
+        // error if there's an error; otherwise default
+        const getInputState = () => {
+          if (error) return 'error';
+          // If value is valid (no error), not empty, and field has been touched or changed
+          if ((isDirty || isTouched) && value && typeof value === 'string' && value.trim() !== '') {
+            return 'success';
+          }
+          return 'default';
+        };
+
+        return (
+          <Input
+            {...inputProps}
+            value={value || ''}
+            onChangeText={handleChangeText}
+            onBlur={onBlur}
+            state={getInputState()}
+            helpText={error?.message}
+          />
+        );
+      }}
     />
   );
 }

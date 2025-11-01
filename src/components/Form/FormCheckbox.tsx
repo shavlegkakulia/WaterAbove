@@ -3,7 +3,7 @@ import {Controller, Control, FieldValues, Path} from 'react-hook-form';
 import {Checkbox, CheckboxProps} from '@/components/Checkbox';
 import {Text} from '@/components/Typography';
 import {View, StyleSheet} from 'react-native';
-import {colors, spacing} from '@/theme';
+import {spacing} from '@/theme';
 
 export interface FormCheckboxProps<T extends FieldValues>
   extends Omit<CheckboxProps, 'checked' | 'onPress'> {
@@ -32,7 +32,7 @@ export function FormCheckbox<T extends FieldValues>({
           />
           {error && (
             <Text
-              variant="caption"
+              variant="caption12Regular"
               color="error"
               style={styles.errorText}>
               {error.message}

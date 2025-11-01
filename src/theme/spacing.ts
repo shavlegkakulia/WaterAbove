@@ -6,6 +6,7 @@ export const spacing = {
   xl: 32,
   xxl: 48,
   xxxl: 64,
+  bordered: 56,
 } as const;
 
 export const borderRadius = {
@@ -15,7 +16,40 @@ export const borderRadius = {
   lg: 12,
   xl: 16,
   xxl: 24,
+  xxxl: 32,
+  xxxxl: 48,
   full: 9999,
+} as const;
+
+export const fontSize = {
+  xxxs: 8,
+  xxs: 10,
+  xs: 12,
+  sm: 14,
+  md: 16,
+  lg: 18,
+  xl: 20,
+  xxl: 24,
+  xxxl: 28,
+  xxxxl: 32,
+} as const;
+
+export const lineHeight = {
+  xxxs: 8,
+  xxs: 10,
+  xs: 12,
+  sm: 14,
+  md: 16,
+  lg: 18,
+  xl: 20,
+  xxl: 24,
+  xxxl: 28,
+  xxxxl: 32,
+  // Additional line heights for typography (only values not in base scale)
+  heading1: 40, // 32px font size (unique)
+  heading2Large: 34, // 28px font size (121.277%, unique)
+  heading3Bold: 24.255, // 20px font size (700 weight, 121.277%, unique decimal)
+  paragraphLarge: 26, // 18px font size (unique)
 } as const;
 
 export const shadows = {
@@ -59,4 +93,5 @@ export const shadows = {
 export type SpacingKey = keyof typeof spacing;
 export type BorderRadiusKey = keyof typeof borderRadius;
 export type ShadowKey = keyof typeof shadows;
-
+export type FontSizeKey = keyof typeof fontSize;
+export type LineHeightKey = keyof typeof lineHeight;
