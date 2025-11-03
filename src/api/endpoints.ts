@@ -33,9 +33,17 @@ export const API_ENDPOINTS = {
   USER: {
     ME: '/user/me',
     PROFILE: '/user/profile',
-    UPDATE: '/user/update',
+    UPDATE: '/users/update',
     AVATAR: '/user/avatar',
     DELETE: '/user/delete',
+    SET_PASSWORD: '/users/set-password',
+    CHECK_USERNAME_AVAILABILITY: '/users/check-username-availability',
+    ACCEPT_TERMS: '/users/accept-terms',
+  },
+
+  // Uploads
+  UPLOAD: {
+    IMAGE: '/uploads/image',
   },
 
   // Config

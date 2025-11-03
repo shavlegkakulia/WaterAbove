@@ -14,6 +14,7 @@ import {useAtomValue, useSetAtom} from 'jotai';
 import {authTokenAtom, userAtom, isAuthenticatedAtom} from '@/store/atoms';
 import {useAuthStatusQuery} from '@/api/query';
 import {setAuthToken as setAxiosAuthToken} from '@/api';
+import {Toast} from '@/components';
 
 // Development tools
 if (__DEV__) {
@@ -70,6 +71,7 @@ function App() {
       <SafeAreaProvider>
         <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
         <RootNavigator />
+        <Toast />
       </SafeAreaProvider>
     </QueryClientProvider>
   );

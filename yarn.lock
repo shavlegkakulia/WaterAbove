@@ -2681,9 +2681,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/elements@npm:^2.8.0":
-  version: 2.8.0
-  resolution: "@react-navigation/elements@npm:2.8.0"
+"@react-navigation/elements@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "@react-navigation/elements@npm:2.8.1"
   dependencies:
     color: ^4.2.3
     use-latest-callback: ^0.2.4
@@ -2697,15 +2697,15 @@ __metadata:
   peerDependenciesMeta:
     "@react-native-masked-view/masked-view":
       optional: true
-  checksum: 4db9f77bc749fb45664358706c9fe197cd4607c64172db340faf3f2be033e18997423c277f31fc649701c4436eec6e2ec4fb5dba2c62bd20193c9e8b8372a8ba
+  checksum: 82e2d4ae99ef0dad3f8a8a70fe8678d7ee41e4e216859ec78e720a0816efdb370940ccbfc7f75874fcd98207336b09cbc44e6a4d38192f7474ef330052bb9195
   languageName: node
   linkType: hard
 
 "@react-navigation/native-stack@npm:^7.6.1":
-  version: 7.6.1
-  resolution: "@react-navigation/native-stack@npm:7.6.1"
+  version: 7.6.2
+  resolution: "@react-navigation/native-stack@npm:7.6.2"
   dependencies:
-    "@react-navigation/elements": ^2.8.0
+    "@react-navigation/elements": ^2.8.1
     color: ^4.2.3
     sf-symbols-typescript: ^2.1.0
     warn-once: ^0.1.1
@@ -2715,7 +2715,7 @@ __metadata:
     react-native: "*"
     react-native-safe-area-context: ">= 4.0.0"
     react-native-screens: ">= 4.0.0"
-  checksum: 5b3f2b4b989cf3a668df84c2d91ef620e5d650ec333d0f46c275dad40f1ef6e4798f9b4395562a15078f7df40a0190e7781c494ba1f282302b0da9543ad9f18e
+  checksum: dd3f12d60c3e9b970d91180f490a9632fefa947e6ccffae36a0c6f06abe0d66c1bf2e2982e0cae9327d075b74922afdbc415ca229792b42f8d24908fbedc86ee
   languageName: node
   linkType: hard
 
@@ -2951,21 +2951,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.90.5":
-  version: 5.90.5
-  resolution: "@tanstack/query-core@npm:5.90.5"
-  checksum: e707343dfa96f7d062269c6ce3ebe7bf624c64ce653e40212fe124962a34be2f9787e451ea5b61c073e53bddad02503294094be19f23c4636d72626eeb40b5e2
+"@tanstack/query-core@npm:5.90.6":
+  version: 5.90.6
+  resolution: "@tanstack/query-core@npm:5.90.6"
+  checksum: c098b6dd41c117aea2e25699ca2fbaf26db1bc84bc01eac83c29aa550940b80a0a5645134abf1fa649674844b767a64c93df8e2facdf60ec33090b23776a8def
   languageName: node
   linkType: hard
 
 "@tanstack/react-query@npm:^5.90.5":
-  version: 5.90.5
-  resolution: "@tanstack/react-query@npm:5.90.5"
+  version: 5.90.6
+  resolution: "@tanstack/react-query@npm:5.90.6"
   dependencies:
-    "@tanstack/query-core": 5.90.5
+    "@tanstack/query-core": 5.90.6
   peerDependencies:
     react: ^18 || ^19
-  checksum: 4a0fce820142aa55d3918b234da7680bfd8ed9c3a0ddc6c7e3ee529728ce97dbd113fefa40a952159c42c90eda8dcedc38cd85e1b06f08b309f60909066ee9a1
+  checksum: 92f2f7282e59246a86521029fcbaa8d072829440bf51f91e4f03582bfdeda5fc3737e202a550f9e6a7a6b5cb7023b8c3fc8f86c8b512e81a2901acb86efebc26
   languageName: node
   linkType: hard
 
@@ -3340,6 +3340,7 @@ __metadata:
     react-native: 0.82.1
     react-native-config: ^1.5.9
     react-native-gesture-handler: ^2.29.0
+    react-native-image-picker: ^8.2.1
     react-native-reanimated: 4.1.3
     react-native-safe-area-context: ^5.6.2
     react-native-screens: ^4.18.0
@@ -3853,11 +3854,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.8.19":
-  version: 2.8.21
-  resolution: "baseline-browser-mapping@npm:2.8.21"
+  version: 2.8.23
+  resolution: "baseline-browser-mapping@npm:2.8.23"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: d355c6c4b81aa6fed4f8383b8310c48aed8775c3a6da50f84e108458e596e7d966e4c7dce1afebb1cd67360624e17c8a5eb2fb471d2df389203d7e7edd3f2ec0
+  checksum: 9417720d14a4ed9f646562b65263356f46ff0b9e024f5c9756da2574e57328cf4bcf649faf951538169a203817496a94b380b1efba134019aa4d2f16bc0fcac5
   languageName: node
   linkType: hard
 
@@ -4049,9 +4050,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001751":
-  version: 1.0.30001751
-  resolution: "caniuse-lite@npm:1.0.30001751"
-  checksum: d11e25c44e40c21e7b7492a25c9fd60f4c04e94aa265573f7c487666f5e1b5ca3ed09d09560336f959237063616255cb294d415511bb6cf0486eb2cb6a3a4318
+  version: 1.0.30001753
+  resolution: "caniuse-lite@npm:1.0.30001753"
+  checksum: d38b17895a99bf1ba9f1a8076233e3d4a606cd0121ccdb381ea94c651aaea0e1587ba3922b11dde4eb153b6741ac3e129fc670df0a7251987ed8619f09059b8a
   languageName: node
   linkType: hard
 
@@ -4556,9 +4557,9 @@ __metadata:
   linkType: hard
 
 "dayjs@npm:^1.8.15":
-  version: 1.11.18
-  resolution: "dayjs@npm:1.11.18"
-  checksum: cc90054bad30ab011417a7a474b2ffa70e7a28ca6f834d7e86fe53a408a40a14c174f26155072628670e9eda4c48c4ed0d847d2edf83d47c0bfb78be15bbf2dd
+  version: 1.11.19
+  resolution: "dayjs@npm:1.11.19"
+  checksum: dfafcca2c67cc6e542fd880d77f1d91667efd323edc28f0487b470b184a11cc97696163ed5be1142ea2a031045b27a0d0555e72f60a63275e0e0401ac24bea5d
   languageName: node
   linkType: hard
 
@@ -4795,9 +4796,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.238":
-  version: 1.5.243
-  resolution: "electron-to-chromium@npm:1.5.243"
-  checksum: 8f5eec2670e9b212c36219402342e83083f3b093188a35346bd2eb6bd8aabf8616dfc2189df2eb49ca5be977c176124eb7b443830bd4a2dbeecb4a878aec2ab5
+  version: 1.5.244
+  resolution: "electron-to-chromium@npm:1.5.244"
+  checksum: 0ca55077fa97c6a59e571d066bb1483399522d849758d878dd8e6b5ed0324c973da2448beb6cf630c2d700853824a633742158194d1345e6d2a53fa278dc8937
   languageName: node
   linkType: hard
 
@@ -7092,8 +7093,8 @@ __metadata:
   linkType: hard
 
 "jotai@npm:^2.15.0":
-  version: 2.15.0
-  resolution: "jotai@npm:2.15.0"
+  version: 2.15.1
+  resolution: "jotai@npm:2.15.1"
   peerDependencies:
     "@babel/core": ">=7.0.0"
     "@babel/template": ">=7.0.0"
@@ -7108,7 +7109,7 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: bcf674db85030772984ca907ca137535d6ad88e0b88e26d025b518cb783675bb80e0295979dcd2145653708e07ad9235c309b98b2f07d25bae9ddbf10ef4677a
+  checksum: 354cd5c61241feed83a0dad0dd7addf4ce75d9c26d67206d78cd4b2904d0a869d62a30a433257dc9331aab63eb5b54e079186b0d5e4eed1fabbba16abb8683f8
   languageName: node
   linkType: hard
 
@@ -8730,11 +8731,11 @@ __metadata:
   linkType: hard
 
 "react-hook-form@npm:^7.65.0":
-  version: 7.65.0
-  resolution: "react-hook-form@npm:7.65.0"
+  version: 7.66.0
+  resolution: "react-hook-form@npm:7.66.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: ad7b6c6919e0f987587a94fe9bed0bd7d4c6817d7f9c4651f8d9d747261ad99b20d85f2ff2f329b86aadecc1ab48d4b0ef2eb13123e1a5d48022dbca259c4aef
+  checksum: 10796a0c45fd94012fe0feb0b7186c5785c259b1bb6ca96f841e394f528b26442de7e2e5dbbe1a1d94429f2dd6f78c600cdadc2d6c78294e0d33d28ca3ad93f5
   languageName: node
   linkType: hard
 
@@ -8801,6 +8802,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 78bc800ccc792a6e09ca2b17fd1f85e12c25892338e9336864b4cd12eceab9c4db8fb95d7e91fbe4796a7743e6d17cbe13d7877217030703d56236ff2d0e122c
+  languageName: node
+  linkType: hard
+
+"react-native-image-picker@npm:^8.2.1":
+  version: 8.2.1
+  resolution: "react-native-image-picker@npm:8.2.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: fc85bc278c0ba5ccef8cbacfce3001e994b34b0895be34e0c884021d2215802c2e553c5e97ff7f21a30e502be60000f90cf9555e9c2a19c71fdc76120d30e158
   languageName: node
   linkType: hard
 
@@ -10107,15 +10118,15 @@ __metadata:
   linkType: hard
 
 "tar@npm:^7.4.3":
-  version: 7.5.1
-  resolution: "tar@npm:7.5.1"
+  version: 7.5.2
+  resolution: "tar@npm:7.5.2"
   dependencies:
     "@isaacs/fs-minipass": ^4.0.0
     chownr: ^3.0.0
     minipass: ^7.1.2
     minizlib: ^3.1.0
     yallist: ^5.0.0
-  checksum: dbd55d4c3bd9e3c69aed137d9dc9fcb8f86afd103c28d97d52728ca80708f4c84b07e0a01d0bf1c8e820be84d37632325debf19f672a06e0c605c57a03636fd0
+  checksum: 192559b0e7af17d57c7747592ef22c14d5eba2d9c35996320ccd20c3e2038160fe8d928fc5c08b2aa1b170c4d0a18c119441e81eae8f227ca2028d5bcaa6bf23
   languageName: node
   linkType: hard
 

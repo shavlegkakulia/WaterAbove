@@ -7,6 +7,8 @@ import {
   EmailCodeScreen,
   EmailVerifiedSuccessScreen,
   PasswordSetupScreen,
+  PersonalizationScreen,
+  WelcomeScreen,
 } from '@/screens/Auth';
 import {RootStackParamList} from './types';
 
@@ -26,6 +28,8 @@ export const RootNavigator: React.FC = () => {
         <Stack.Screen name="EmailCode" component={EmailCodeScreen} />
         <Stack.Screen name="EmailVerifiedSuccess" component={EmailVerifiedSuccessScreen} />
         <Stack.Screen name="PasswordSetup" component={PasswordSetupScreen} />
+        <Stack.Screen name="Personalization" component={PersonalizationScreen} />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

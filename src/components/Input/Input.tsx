@@ -16,6 +16,7 @@ export type InputState = 'default' | 'focused' | 'success' | 'error' | 'disabled
 export interface InputProps extends Omit<TextInputProps, 'editable'> {
   label?: string;
   helpText?: string;
+  errorMessage?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   state?: InputState;
@@ -25,6 +26,7 @@ export interface InputProps extends Omit<TextInputProps, 'editable'> {
 export const Input: React.FC<InputProps> = ({
   label,
   helpText,
+  errorMessage,
   leftIcon,
   rightIcon,
   state = 'default',
@@ -98,7 +100,7 @@ export const Input: React.FC<InputProps> = ({
               {color: getTextColor()},
               style,
             ]}
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor="#F1F1F1"
             editable={state !== 'disabled'}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -113,6 +115,14 @@ export const Input: React.FC<InputProps> = ({
           color='textWhiteWA'
           style={styles.helpText}>
           {helpText}
+        </Text>
+      )}
+      {errorMessage && (
+        <Text
+          variant="caption12Regular"
+          color='textWhiteWA'
+          style={styles.helpText}>
+          {errorMessage}
         </Text>
       )}
     </View>
@@ -149,7 +159,7 @@ const styles = StyleSheet.create({
   },
   helpText: {
     marginTop: moderateScale(spacing.xs),
-    marginLeft: moderateScale(spacing.md),
+    marginHorizontal: moderateScale(spacing.md),
   },
   disabled: {
     opacity: 0.5,

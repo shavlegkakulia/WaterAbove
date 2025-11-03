@@ -1,6 +1,15 @@
 import {apiClient} from '../client';
 import {API_ENDPOINTS} from '../endpoints';
-import type {User, UpdateProfileRequest} from '../types';
+import type {
+  User,
+  UpdateProfileRequest,
+  CheckUsernameAvailabilityRequest,
+  CheckUsernameAvailabilityResponse,
+  AcceptTermsRequest,
+  AcceptTermsResponse,
+  UpdateUserRequest,
+  UpdateUserResponse,
+} from '../types';
 
 /**
  * User Service
@@ -48,6 +57,30 @@ export const userService = {
    */
   deleteAccount: async (): Promise<void> => {
     await apiClient.delete(API_ENDPOINTS.USER.DELETE);
+  },
+
+  /**
+   * Check if username is available
+   */
+  checkUsernameAvailability: async (data: CheckUsernameAvailabilityRequest): Promise<CheckUsernameAvailabilityResponse> => {
+    const response = await apiClient.post(API_ENDPOINTS.USER.CHECK_USERNAME_AVAILABILITY, data);
+    return response.data;
+  },
+
+  /**
+   * Accept terms and conditions
+   */
+  acceptTerms: async (data: AcceptTermsRequest): Promise<AcceptTermsResponse> => {
+    const response = await apiClient.post(API_ENDPOINTS.USER.ACCEPT_TERMS, data);
+    return response.data;
+  },
+
+  /**
+   * Update user profile (new format)
+   */
+  updateUser: async (data: UpdateUserRequest): Promise<UpdateUserResponse> => {
+    const response = await apiClient.post(API_ENDPOINTS.USER.UPDATE, data);
+    return response.data;
   },
 };
 

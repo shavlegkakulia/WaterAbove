@@ -12,6 +12,8 @@ import type {
   RegisterRequest,
   VerifyEmailRequest,
   VerifyEmailCodeRequest,
+  SetPasswordRequest,
+  User,
 } from '@/api/types';
 
 /**
@@ -164,6 +166,49 @@ export const useResetPasswordMutation = () => {
 export const useVerifyEmailCodeMutation = () => {
   return useMutation({
     mutationFn: (data: VerifyEmailCodeRequest) => authService.verifyEmailCode(data),
+  });
+};
+
+/**
+ * Set Password Mutation (for new users after email verification)
+ * 
+ * @example
+ * const setPasswordMutation = useSetPasswordMutation();
+ * 
+ * setPasswordMutation.mutate(
+ *   { password: 'NewPassword123!' },
+ *   {
+ *     onSuccess: (response) => console.log(response.message),
+ *     onError: (error) => console.error('Failed:', error),
+ *   }
+ * );
+ */
+export const useSetPasswordMutation = () => {
+  const queryClient = useQueryClient();
+  const setUser = useSetAtom(userAtom);
+
+  return useMutation({
+    mutationFn: (data: SetPasswordRequest) => authService.setPassword(data),
+    onSuccess: (response) => {
+      // Update user state if needed
+      if (response.data) {
+        // Map response data to User type
+        const user: User = {
+          id: response.data.id,
+          email: response.data.email,
+          name: response.data.fullName || response.data.username || undefined,
+          createdAt: response.data.createdAt,
+          updatedAt: response.data.updatedAt,
+        };
+        setUser(user);
+      }
+      
+      // Invalidate user queries
+      queryClient.invalidateQueries({queryKey: queryKeys.auth.user});
+    },
+    onError: (error: any) => {
+      console.error('Set password error:', error);
+    },
   });
 };
 

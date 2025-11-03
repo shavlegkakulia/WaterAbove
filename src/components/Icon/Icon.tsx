@@ -81,6 +81,7 @@ export {
   Pause,
   VolumeX,
   Volume2,
+  Camera,
 
   // UI
   Eye,
@@ -93,6 +94,7 @@ export {
   AlertCircle,
   CheckCircle,
   XCircle,
+  Calendar,
 
   // Files
   File,

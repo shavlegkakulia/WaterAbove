@@ -6,7 +6,7 @@ const guidelineBaseWidth = 430;
 
 export const scale = (size: number) => (width / guidelineBaseWidth) * size;
 
-export const moderateScale = (size: number, factor = 0.5) =>
+export const moderateScale = (size: number, factor = 1) =>
   size + (scale(size) - size) * factor;
 
 

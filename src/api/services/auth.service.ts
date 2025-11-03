@@ -10,6 +10,8 @@ import type {
   VerifyEmailCodeRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  SetPasswordRequest,
+  SetPasswordResponse,
   AuthStatusResponse,
 } from '../types';
 
@@ -97,6 +99,18 @@ export const authService = {
     newPassword: string;
   }): Promise<void> => {
     await apiClient.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
+  },
+
+  /**
+   * Set password (for new users after email verification)
+   */
+  setPassword: async (data: SetPasswordRequest): Promise<SetPasswordResponse> => {
+    const response = await apiClient.post(API_ENDPOINTS.USER.SET_PASSWORD, data);
+    if (response.status >= 400) {
+      const errorMessage = response.data?.message || response.data?.error || 'Failed to set password';
+      throw new Error(errorMessage);
+    }
+    return response.data;
   },
 };
 

@@ -48,9 +48,17 @@ export const VerificationScreen: React.FC = () => {
 
     if (result.success) {
       if ((result as any).alreadyVerified) {
-        navigation.navigate('Login', {
-          email: (result as any).user?.email || data.email,
-          alreadyVerified: true,
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'Login',
+              params: {
+                email: (result as any).user?.email || data.email,
+                alreadyVerified: true,
+              },
+            },
+          ],
         });
         return;
       }
@@ -63,7 +71,7 @@ export const VerificationScreen: React.FC = () => {
   };
 
   const handleBackToLogin = () => {
-    navigation.navigate('Login');
+    navigation.goBack();
   };
 
   const isButtonDisabled = isVerifying || !isValid;
@@ -103,7 +111,13 @@ export const VerificationScreen: React.FC = () => {
         />
 
         {/* Back to Login */}
-        <LinkLabel onPress={handleBackToLogin} textVariant="paragraph14Bold" underline style={styles.backToLoginLink}>Back to Login Screen</LinkLabel>
+        <LinkLabel
+          onPress={handleBackToLogin}
+          textVariant="paragraph14Bold"
+          style={styles.backToLoginLink}
+        >
+          Back to Login Screen
+        </LinkLabel>
       </FormCard>
     </AuthScreenWrapper>
   );

@@ -41,7 +41,6 @@ export const LoginScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const prefillEmail = route.params?.email || '';
   const fromAlreadyVerified = route.params?.alreadyVerified === true;
-  const hideCreate = route.params?.hideCreate === true;
   const { login, isLoading } = useAuth();
   const { showSuccess, showError } = useToast();
   const [rememberMe, setRememberMe] = useState(false);
@@ -144,8 +143,8 @@ export const LoginScreen: React.FC = () => {
         />
 
         {/* Divider and Create Account Section */}
-        {!hideCreate && (
-          <>
+        {!fromAlreadyVerified && (
+          <View style={styles.dividerContainer}>
             <Divider />
             <View style={styles.createAccountContainer}>
               <Text variant="body16Bold" color="textWhiteWA">
@@ -155,8 +154,9 @@ export const LoginScreen: React.FC = () => {
                 Create an account
               </LinkLabel>
             </View>
-          </>
+          </View>
         )}
+        <View style={styles.emptySpace} />
       </FormCard>
     </AuthScreenWrapper>
   );
@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     width: '100%',
-    marginBottom: moderateScale(36),
   },
   createAccountContainer: {
     flexDirection: 'row',
@@ -197,12 +196,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexWrap: 'wrap',
     marginTop: moderateScale(25),
-    marginBottom: moderateScale(56),
   },
   iconPlaceholder: {
     width: moderateScale(24),
     height: moderateScale(24),
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  dividerContainer: {
+    
+  },
+  emptySpace: {
+    marginBottom: moderateScale(56),
   },
 });

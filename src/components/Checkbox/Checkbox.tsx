@@ -6,15 +6,18 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import {colors, spacing, borderRadius, TypographyKey} from '@/theme';
+import {colors, spacing, TypographyKey} from '@/theme';
 import {Text} from '@/components/Typography';
 import { moderateScale } from '@/utils';
+
+export type CheckboxSize = 14 | 16 | 18 | 20 | 22 | 24;
 
 export interface CheckboxProps {
   checked: boolean;
   onPress: () => void;
   label?: string;
   disabled?: boolean;
+  size?: CheckboxSize;
   containerStyle?: ViewStyle;
   checkboxStyle?: ViewStyle;
   labelStyle?: TextStyle;
@@ -26,11 +29,15 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   onPress,
   label,
   disabled = false,
+  size = 14,
   containerStyle,
   checkboxStyle,
   labelStyle,
   variant = 'caption12Regular', // default variant  
 }) => {
+  const checkboxSize = moderateScale(size);
+  const checkmarkSize = moderateScale(size * 0.5); // Checkmark is roughly half the size
+  
   return (
     <TouchableOpacity
       style={[styles.container, containerStyle]}
@@ -40,11 +47,21 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       <View
         style={[
           styles.checkbox,
-          checked && styles.checkboxChecked,
+          {
+            width: checkboxSize,
+            height: checkboxSize,
+            borderRadius: moderateScale(4),
+            borderWidth: 1,
+            borderColor: checked ? '#46C2A3' : '#0369F1',
+            backgroundColor: 'transparent',
+          },
           disabled && styles.disabled,
           checkboxStyle,
         ]}>
-        {checked && <View style={styles.checkmark} />}
+        {checked && <View style={[styles.checkmark, {
+          width: checkmarkSize,
+          height: checkmarkSize * 0.6,
+        }]} />}
       </View>
       {label && (
         <Text
@@ -64,28 +81,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   checkbox: {
-    width: moderateScale(16),
-    height: moderateScale(16),
-    borderRadius: borderRadius.sm,
-    borderWidth: 2,
-    borderColor: colors.white,
-    backgroundColor: colors.transparent,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: moderateScale(spacing.sm),
   },
-  checkboxChecked: {
-    backgroundColor: colors.white,
-    borderColor: colors.white,
-  },
   checkmark: {
-    width: 10,
-    height: 6,
     borderLeftWidth: 2,
     borderBottomWidth: 2,
-    borderColor: colors.accent,
+    borderColor: '#46C2A3',
     transform: [{rotate: '-45deg'}],
-    marginTop: -1,
+    marginTop: -2,
   },
   label: {
     flex: 1,

@@ -3,9 +3,10 @@ import {Controller, Control, FieldValues, Path} from 'react-hook-form';
 import {Input, InputProps} from '@/components/Input';
 
 export interface FormInputProps<T extends FieldValues>
-  extends Omit<InputProps, 'value' | 'onChangeText' | 'state' | 'helpText'> {
+  extends Omit<InputProps, 'value' | 'onChangeText' | 'state'> {
   control: Control<T>;
   name: Path<T>;
+  errorMessage?: string;
   rules?: any;
   onChangeTextFilter?: (text: string) => string;
 }
@@ -46,7 +47,8 @@ export function FormInput<T extends FieldValues>({
             onChangeText={handleChangeText}
             onBlur={onBlur}
             state={getInputState()}
-            helpText={error?.message}
+            errorMessage={error?.message}
+            helpText={inputProps.helpText}
           />
         );
       }}

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { spacing } from '@/theme';
 import {
   Button,
@@ -16,15 +18,19 @@ import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/types';
 import { useToast } from '@/store/hooks';
+import { useSetPasswordMutation } from '@/api/query';
 import { passwordSetupSchema, type PasswordSetupFormData } from '@/validation';
 import { moderateScale } from '@/utils';
 
 export const PasswordSetupScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'PasswordSetup'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const email = route.params?.email || '';
-  const { showSuccess } = useToast();
+  const { showSuccess, showError } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  const setPasswordMutation = useSetPasswordMutation();
 
   const {
     control,
@@ -40,11 +46,20 @@ export const PasswordSetupScreen: React.FC = () => {
   });
 
   const onSubmit = async (data: PasswordSetupFormData) => {
-    // TODO: Implement password setup API call
-    console.log('Password setup:', { email, password: data.password });
-    showSuccess('Password created successfully!');
-    // Navigate to next screen or login
-    // navigation.navigate('Login', { email });
+    try {
+      const response = await setPasswordMutation.mutateAsync({
+        password: data.password,
+      });
+      
+      if (response.success) {
+        showSuccess(response.message || 'Password created successfully!');
+        // Navigate to personalization screen
+        navigation.navigate('Personalization', { email });
+      }
+    } catch (error: any) {
+      const errorMessage = error?.message || error?.response?.data?.message || 'Failed to set password. Please try again.';
+      showError(errorMessage);
+    }
   };
 
   return (
@@ -82,11 +97,8 @@ export const PasswordSetupScreen: React.FC = () => {
             />
           }
           containerStyle={styles.input}
-          
+          helpText="Ensure it has 8+ characters, with a mix of upper/lowercase letters, a number, and a special character."
         />
-        <Text variant="caption12Regular" color="textPrimary" style={styles.requirementText}>
-          Ensure it has 8+ characters, with a mix of upper/lowercase letters, a number, and a special character.
-        </Text>
 
         {/* Confirm Password Input */}
         <FormInput
@@ -109,7 +121,8 @@ export const PasswordSetupScreen: React.FC = () => {
           title="Save and Continue"
           variant="primary"
           size="small"
-          disabled={!isValid}
+          disabled={!isValid || setPasswordMutation.isPending}
+          loading={setPasswordMutation.isPending}
           onPress={handleSubmit(onSubmit)}
           containerStyle={styles.button}
         />
@@ -133,13 +146,6 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     marginBottom: moderateScale(34),
-  },
-  requirementText: {
-    marginTop: -moderateScale(30),
-    marginBottom: moderateScale(spacing.md),
-    marginLeft: moderateScale(spacing.md),
-    color: '#F1F1F1',
-    // Uses caption variant from typography (12px, 400, 16 lineHeight)
   },
   button: {
     width: '100%',
