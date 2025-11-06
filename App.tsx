@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/api/query';
 import { RootNavigator, navigationRef } from '@/navigation';
+import { getInitialNavigationRoute } from '@/utils/navigation';
 // no-op import removed
 import { useAtomValue, useSetAtom } from 'jotai';
 import { authTokenAtom, userAtom, isAuthenticatedAtom } from '@/store/atoms';
@@ -139,55 +140,22 @@ const BootstrapAuth: React.FC = () => {
         });
       }
 
-      // Navigate based on user status
-      const email = apiUser?.email;
-      const isVerified = apiUser?.isVerified === true;
-      const hasPassword = apiUser?.hasPassword === true;
-      const hasUsername = !!apiUser?.username;
-      const hasUserLocation = !!apiUser?.userLocation;
+      // Determine navigation route based on user status
+      const route = getInitialNavigationRoute(apiUser);
+      
+      // Set authentication state
+      const isAuthenticated = 
+        apiUser?.isVerified === true && 
+        apiUser?.hasPassword === true;
+      setIsAuthenticated(isAuthenticated);
 
-      if (email && isVerified && !hasPassword) {
-        // User is verified but doesn't have password - go to PasswordSetup
-        navigationRef.current?.reset({
-          index: 0,
-          routes: [{ name: 'PasswordSetup', params: { email } }],
-        });
-      } else if (isVerified && hasPassword) {
-        // User is verified and has password - authenticated
-        setIsAuthenticated(true);
-        
-        // Check if user has username but no location
-        if (hasUsername && !hasUserLocation) {
-          // Navigate to LocationPersonalization screen
-          navigationRef.current?.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'LocationPersonalization',
-                params: { email: email || '' },
-              },
-            ],
-          });
-        } else {
-          // Navigate to Personalization screen
-          navigationRef.current?.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'Personalization',
-                params: { email: email || '' },
-              },
-            ],
-          });
-        }
-      } else {
-        // User is not verified or doesn't have password - go to Login
-        setIsAuthenticated(false);
-        navigationRef.current?.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
-      }
+      // Navigate to determined route
+      navigationRef.current?.reset({
+        index: 0,
+        routes: route.params 
+          ? [{ name: route.name, params: route.params }]
+          : [{ name: route.name }],
+      });
     } else {
       // No valid response - go to Login
       setIsAuthenticated(false);

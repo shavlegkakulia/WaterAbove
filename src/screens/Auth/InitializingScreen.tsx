@@ -1,13 +1,12 @@
 import React from 'react';
-import {StyleSheet, View, ActivityIndicator} from 'react-native';
-import {AuthScreenWrapper} from '@/components';
-import {colors} from '@/theme';
+import {StyleSheet, View} from 'react-native';
+import {AuthScreenWrapper, Logo} from '@/components';
 
 export const InitializingScreen: React.FC = () => {
   return (
-    <AuthScreenWrapper>
+    <AuthScreenWrapper withKeyboardAvoiding={false} withScrollView={false}>
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={colors.white} />
+        <Logo size={120} />
       </View>
     </AuthScreenWrapper>
   );
