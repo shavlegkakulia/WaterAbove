@@ -12,6 +12,7 @@ import {
   useLogoutMutation,
   useVerifyEmailMutation,
 } from '@/api/query';
+import type { ApiUser } from '@/api/types';
 // setAxiosAuthToken used in mutation files, not needed here directly
 
 /**
@@ -62,9 +63,9 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (email: string, password: string, name?: string) => {
+  const register = async (email: string, password: string, fullName?: string) => {
     try {
-      await registerMutation.mutateAsync({email, password, name});
+      await registerMutation.mutateAsync({email, password, fullName});
       return {success: true};
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Registration failed';
@@ -93,6 +94,16 @@ export const useAuth = () => {
 };
 
 /**
+ * Email Verification Result
+ */
+export interface VerifyEmailResult {
+  success: boolean;
+  alreadyVerified?: boolean;
+  user?: ApiUser;
+  error?: string;
+}
+
+/**
  * Email Verification Hook
  * 
  * Combines React Query mutation with Jotai state management
@@ -111,14 +122,16 @@ export const useEmailVerification = () => {
   // React Query mutation
   const verifyEmailMutation = useVerifyEmailMutation();
   
-  const verifyEmail = async (emailToVerify: string) => {
+  const verifyEmail = async (emailToVerify: string): Promise<VerifyEmailResult> => {
     try {
       const response = await verifyEmailMutation.mutateAsync({email: emailToVerify});
 
       // Special case: server returns success with error "User already verified"
+      // Check if response.data has user object (API might return user in data)
+      const responseData = response.data as { user?: ApiUser; message?: string } | undefined;
       const alreadyVerified =
         response.success === true &&
-        (response.error === 'User already verified' || (response.data as any)?.user?.isVerified === true);
+        (response.error === 'User already verified' || responseData?.user?.isVerified === true);
 
       if (response.success && !alreadyVerified) {
         setEmail(emailToVerify);
@@ -126,7 +139,7 @@ export const useEmailVerification = () => {
       }
 
       if (alreadyVerified) {
-        const user = (response.data as any)?.user;
+        const user = responseData?.user;
         return {success: true, alreadyVerified: true, user};
       }
 

@@ -40,12 +40,22 @@ export function FormInput<T extends FieldValues>({
           return 'default';
         };
 
+        const handleBlur = (e: any) => {
+          onBlur();
+          inputProps.onBlur?.(e);
+        };
+
+        const handleFocus = (e: any) => {
+          inputProps.onFocus?.(e);
+        };
+
         return (
           <Input
             {...inputProps}
             value={value || ''}
             onChangeText={handleChangeText}
-            onBlur={onBlur}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
             state={getInputState()}
             errorMessage={error?.message}
             helpText={inputProps.helpText}

@@ -1,3 +1,5 @@
+import { ApiUser } from "@/api";
+
 export type RootStackParamList = {
   Initializing: undefined;
   Verification: undefined;
@@ -6,7 +8,8 @@ export type RootStackParamList = {
   EmailVerifiedSuccess: { email: string };
   PasswordSetup: { email: string };
   Personalization: { email: string };
-  LocationPersonalization: { email: string };
+  LocationPersonalization: { email: string; userLocation?: ApiUser['userLocation']; profileCompletionPercentage?: number };
+  ProfilePersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
   Welcome: { avatarUrl?: string; avatarBase64?: string; email?: string };
   ForgotPassword: undefined;
   CheckInbox: { email: string };

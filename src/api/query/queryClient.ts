@@ -64,6 +64,11 @@ export const queryKeys = {
     detail: (id: string) => ['posts', 'detail', id] as const,
   },
   
+  // Locations
+  locations: {
+    autocomplete: (query: string, limit?: number) => ['locations', 'autocomplete', query, limit] as const,
+  },
+  
   // Add more as needed...
 } as const;
 

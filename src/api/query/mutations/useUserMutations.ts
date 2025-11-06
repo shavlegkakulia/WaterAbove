@@ -1,5 +1,6 @@
-import {useMutation} from '@tanstack/react-query';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {userService, uploadService} from '@/api';
+import {queryKeys} from '../queryClient';
 import type {
   CheckUsernameAvailabilityRequest,
   CheckUsernameAvailabilityResponse,
@@ -54,10 +55,20 @@ export const useUploadImageMutation = () => {
 
 /**
  * Update User Mutation
+ * Invalidates user-related queries on success
  */
 export const useUpdateUserMutation = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<UpdateUserResponse, any, UpdateUserRequest>({
     mutationFn: (data: UpdateUserRequest) => userService.updateUser(data),
+    onSuccess: () => {
+      // Invalidate user-related queries to refetch updated data
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.session });
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.user });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.me });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.profile });
+    },
   });
 };
 

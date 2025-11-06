@@ -8,6 +8,7 @@ export * from './endpoints';
 export * from './services/auth.service';
 export * from './services/user.service';
 export * from './services/upload.service';
+export * from './services/location.service';
 
 // Export types
 export * from './types';

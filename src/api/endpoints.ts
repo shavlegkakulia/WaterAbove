@@ -34,4 +34,11 @@ export const API_ENDPOINTS = {
   UPLOAD: {
     IMAGE: '/uploads/image',
   },
+
+  // Locations
+  LOCATIONS: {
+    AUTOCOMPLETE: '/locations/autocomplete',
+    MEMBER_COUNTS: '/locations/member-counts',
+    UPDATE_USER_LOCATION: '/locations/update-user-location',
+  },
 } as const;

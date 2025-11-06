@@ -13,9 +13,15 @@ import { moderateScale } from '@/utils';
 export interface FormCardProps {
   children: React.ReactNode;
   style?: ViewStyle;
+  hasHorizontalPadding?: boolean;
 }
 
-export const FormCard: React.FC<FormCardProps> = ({ children, style }) => {
+export const FormCard: React.FC<FormCardProps> = ({ children, style, hasHorizontalPadding = true }) => {
+  const cardContentStyle = {
+    ...styles.cardContent,
+    paddingHorizontal: hasHorizontalPadding ? moderateScale(spacing.xl) : 0,
+  };
+
   return (
     <BlurView
       blurType="dark"
@@ -23,7 +29,9 @@ export const FormCard: React.FC<FormCardProps> = ({ children, style }) => {
       style={[styles.card, style]}
     >
       <Pressable onPress={() => Keyboard.dismiss()}>
-        <View style={styles.cardContent}>{children}</View>
+        <View style={cardContentStyle}>
+          {children}
+        </View>
       </Pressable>
     </BlurView>
   );
@@ -36,6 +44,5 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     alignItems: 'center',
-    paddingHorizontal: moderateScale(spacing.xl),
   },
 });

@@ -41,6 +41,124 @@ export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
 export type UserRole = 'OWNER' | 'MEMBER' | 'ADMIN';
 
 /**
+ * User Purpose
+ */
+export type UserPurpose =
+  | 'starting-a-business'
+  | 'networking'
+  | 'looking-for-work'
+  | 'hiring'
+  | 'making-friends'
+  | 'dating';
+
+/**
+ * User Topic
+ */
+export type UserTopic =
+  | 'writing'
+  | 'technology'
+  | 'skilled-trades'
+  | 'start-ups'
+  | 'music'
+  | 'marketing'
+  | 'podcasting'
+  | 'film'
+  | 'photography'
+  | 'health-and-wellness'
+  | 'art-and-design'
+  | 'hospitality'
+  | 'travel'
+  | 'finances'
+  | 'education'
+  | 'ecommerce'
+  | 'coaching'
+  | 'care-giving'
+  | 'spirituality'
+  | 'biz-ops'
+  | 'parenting'
+  | 'events'
+  | 'animals'
+  | 'gaming'
+  | 'cooking';
+
+/**
+ * User Employment Status
+ */
+export type UserEmploymentStatus =
+  | 'entrepreneur'
+  | 'self-employed'
+  | 'homemaker'
+  | 'student'
+  | 'retired'
+  | 'employee'
+  | 'looking-for-work'
+  | 'hiring'
+  | 'side-hustler'
+  | 'unemployed'
+  | 'prefer-not-to-say';
+
+/**
+ * User Level of Education
+ */
+export type UserLevelOfEducation =
+  | 'no-formal-education'
+  | 'some-high-school'
+  | 'high-school-diploma-ged'
+  | 'associates-degree'
+  | 'bachelors-degree'
+  | 'masters-degree'
+  | 'doctorate-degree'
+  | 'professional-degree'
+  | 'trade-technical'
+  | 'prefer-not-to-say';
+
+/**
+ * User Gender
+ */
+export type UserGender = 'male' | 'female' | 'other' | 'unspecified';
+
+/**
+ * User Zodiac Sign
+ */
+export type UserZodiacSign =
+  | 'aries'
+  | 'taurus'
+  | 'gemini'
+  | 'cancer'
+  | 'leo'
+  | 'virgo'
+  | 'libra'
+  | 'scorpio'
+  | 'ophiuchus'
+  | 'sagittarius'
+  | 'capricorn'
+  | 'aquarius'
+  | 'pisces';
+
+/**
+ * User Relationship Status
+ */
+export type UserRelationshipStatus =
+  | 'working-on-myself'
+  | 'just-vibing'
+  | 'dating'
+  | 'in-a-relationship'
+  | 'single'
+  | 'single-and-seeking'
+  | 'happily-single'
+  | 'married';
+
+/**
+ * User Opinion on Having Children
+ */
+export type UserOpinionOnHavingChildren =
+  | 'prefer-not-to-say'
+  | 'have-kids'
+  | 'want-kids'
+  | 'do-not-want-kids'
+  | 'unsure';
+
+/**
  * User Profile
  * All values are nullable - API could return all, none, or any combination
  */
@@ -287,7 +405,7 @@ export interface UpdateUserRequest {
     gender?: 'MALE' | 'FEMALE' | 'OTHER' | string;
     genderOther?: string;
     zodiacSign?: string;
-    purpose?: string;
+    purpose?: string | string[];
     profileCompletionPercentage?: number;
     showAge?: boolean;
     showDob?: boolean;
@@ -399,6 +517,97 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+// ============================================================================
+// Location Types
+// ============================================================================
+
+export interface LocationAutocompleteRequest {
+  limit: number;
+  q: string;
+}
+
+export interface LocationCity {
+  id: string;
+  name: string;
+  countryId: string;
+  countryName: string;
+  countryCode: string;
+  continentId: string;
+  continentName: string;
+  continentCode: string;
+  regionId: string;
+  regionName: string;
+  regionCode: string | null;
+  formattedAddress: string;
+}
+
+export interface LocationAutocompleteResponse {
+  cities: LocationCity[];
+}
+
+export type LocationAutocompleteApiResponse = ApiSuccessResponse<LocationAutocompleteResponse>;
+
+export interface LocationMemberCountsRequest {
+  cityId?: string;
+  countryId?: string;
+  regionId?: string;
+  continentId?: string;
+}
+
+export interface LocationMemberCount {
+  id: string;
+  name: string;
+  code?: string | null;
+  memberCount: number;
+}
+
+export interface LocationMemberCountsResponse {
+  continent?: LocationMemberCount;
+  country?: LocationMemberCount;
+  region?: LocationMemberCount;
+  city?: LocationMemberCount;
+}
+
+export type LocationMemberCountsApiResponse = ApiSuccessResponse<LocationMemberCountsResponse>;
+
+export interface UpdateUserLocationRequest {
+  continentId?: string;
+  countryId?: string;
+  regionId?: string;
+  cityId?: string;
+  showOnProfile: boolean;
+  subscribeToMemberMap: boolean;
+  subscribeToContinentGroup: boolean;
+  subscribeToCountryGroup: boolean;
+  subscribeToRegionGroup: boolean;
+  subscribeToCityGroup: boolean;
+  formattedAddress: string;
+}
+
+export interface UserLocationResponse {
+  id: string;
+  userId: string;
+  continentId?: string;
+  countryId?: string;
+  regionId?: string;
+  cityId?: string;
+  formattedAddress: string;
+  showOnProfile: boolean;
+  subscribeToMemberMap: boolean;
+  subscribeToContinentGroup: boolean;
+  subscribeToCountryGroup: boolean;
+  subscribeToRegionGroup: boolean;
+  subscribeToCityGroup: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateUserLocationResponse {
+  location: UserLocationResponse;
+}
+
+export type UpdateUserLocationApiResponse = ApiSuccessResponse<UpdateUserLocationResponse>;
 
 // Legacy types (kept for backward compatibility)
 export interface ApiError {

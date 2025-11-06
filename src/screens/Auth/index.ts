@@ -5,6 +5,7 @@ export * from './EmailVerifiedSuccessScreen';
 export * from './PasswordSetupScreen';
 export * from './PersonalizationScreen';
 export * from './LocationPersonalizationScreen';
+export * from './ProfilePersonalizationScreen';
 export * from './WelcomeScreen';
 export * from './ForgotPasswordScreen';
 export * from './CheckInboxScreen';

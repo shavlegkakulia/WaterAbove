@@ -65,6 +65,7 @@ export const LoginScreen: React.FC = () => {
     if (result?.success === true) {
       showSuccess('Welcome back!');
       // Navigation will be handled by auth state change
+      navigation.navigate('LocationPersonalization', { email: data.email }); // TODO: Change to needed screen
     } else {
       showError(result.error || 'Login failed. Please try again.');
     }
