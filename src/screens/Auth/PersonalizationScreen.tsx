@@ -37,7 +37,8 @@ import type {
   UpdateUserResponse,
   CheckUsernameAvailabilityResponse,
 } from '@/api/types';
-import { pickImageFromLibrary, takePhoto, pickFile } from '@/utils/imagePicker';
+import { pickImageFromLibrary, takePhoto, pickFile, type ImagePickerResult } from '@/utils/imagePicker';
+import { validateImage } from '@/utils/imageValidation';
 import { useNavigation } from '@react-navigation/native';
 
 export const PersonalizationScreen: React.FC = () => {
@@ -51,6 +52,7 @@ export const PersonalizationScreen: React.FC = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
+  const [profileImageBase64, setProfileImageBase64] = useState<string | null>(null);
   const [profileImagePosition, setProfileImagePosition] = useState<{
     x: number;
     y: number;
@@ -112,14 +114,10 @@ export const PersonalizationScreen: React.FC = () => {
         {
           onSuccess: (response: CheckUsernameAvailabilityResponse) => {
             console.log('Username check response:', response);
-            console.log('Response type:', typeof response);
-            console.log('Response.available:', response?.available);
-            console.log('Response.available type:', typeof response?.available);
             
-            // Check if response has available property directly
-            // Handle both direct response and wrapped response (response.data)
-            const responseData = (response as any)?.data || response;
-            const isAvailable = responseData?.available === true;
+            // Response is wrapped in ApiSuccessResponse structure
+            // Access data through response.data
+            const isAvailable = response.success && response.data?.available === true;
             
             console.log('isAvailable:', isAvailable);
             
@@ -207,14 +205,37 @@ export const PersonalizationScreen: React.FC = () => {
     setShowTermsModal(false);
   };
 
+  /**
+   * Validate and set profile image
+   */
+  const handleImageSelection = (result: ImagePickerResult | null) => {
+    if (!result?.uri) {
+      return;
+    }
+
+    // Validate image according to backend requirements
+    const validation = validateImage(result.fileSize, result.type);
+    if (!validation.valid) {
+      showError(validation.error || 'Image validation failed');
+      return;
+    }
+
+    setProfileImageUri(result.uri);
+    // Store base64 for displaying on WelcomeScreen
+    if (result.base64) {
+      // Add data URI prefix based on image type
+      const mimeType = result.type || 'image/jpeg';
+      const base64DataUri = `data:${mimeType};base64,${result.base64}`;
+      setProfileImageBase64(base64DataUri);
+    }
+  };
+
   const handlePhotoLibrary = async () => {
     try {
       console.log('handlePhotoLibrary called');
       const result = await pickImageFromLibrary();
       console.log('pickImageFromLibrary result:', result);
-      if (result?.uri) {
-        setProfileImageUri(result.uri);
-      }
+      handleImageSelection(result);
     } catch (error: any) {
       console.error('handlePhotoLibrary error:', error);
       showError(error?.message || 'Failed to pick image from library');
@@ -224,9 +245,7 @@ export const PersonalizationScreen: React.FC = () => {
   const handleTakePhoto = async () => {
     try {
       const result = await takePhoto();
-      if (result?.uri) {
-        setProfileImageUri(result.uri);
-      }
+      handleImageSelection(result);
     } catch (error: any) {
       showError(error?.message || 'Failed to take photo');
     }
@@ -235,9 +254,7 @@ export const PersonalizationScreen: React.FC = () => {
   const handleChooseFile = async () => {
     try {
       const result = await pickFile();
-      if (result?.uri) {
-        setProfileImageUri(result.uri);
-      }
+      handleImageSelection(result);
     } catch (error: any) {
       showError(error?.message || 'Failed to pick file');
     }
@@ -254,11 +271,11 @@ export const PersonalizationScreen: React.FC = () => {
     const fileExtension = match ? match[1].toLowerCase() : 'jpg';
     
     // Map file extensions to MIME types
+    // Only supported types: PNG, JPEG, WEBP (as per backend requirements)
     const mimeTypes: Record<string, string> = {
       jpg: 'image/jpeg',
       jpeg: 'image/jpeg',
       png: 'image/png',
-      gif: 'image/gif',
       webp: 'image/webp',
     };
     
@@ -271,7 +288,7 @@ export const PersonalizationScreen: React.FC = () => {
       uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri, // iOS needs file:// removed
       type,
       name: filename,
-    } as any);
+    } as FormDataPart);
 
     console.log('FormData created:', {
       filename,
@@ -365,13 +382,15 @@ export const PersonalizationScreen: React.FC = () => {
       }
 
       showSuccess('Account personalized successfully!');
-      // Navigate to Welcome screen
-      // @ts-ignore - Navigation type will be updated when Welcome screen is added
-      navigation.navigate('Welcome');
+      // Navigate to Welcome screen with uploaded avatar URL and base64 image
+      navigation.navigate('Welcome', { 
+        avatarUrl,
+        avatarBase64: profileImageBase64 || undefined,
+      });
     } catch (error: any) {
-      const errorMessage =
-        error?.message || 'Failed to save personalization. Please try again.';
-      showError(errorMessage);
+      // Error handling is done in axios interceptor
+      // Just re-throw to let the interceptor handle it
+      throw error;
     }
   };
 

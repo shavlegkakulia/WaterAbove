@@ -45,8 +45,9 @@ export const useAuth = () => {
   // Wrapper functions for backward compatibility
   const login = async (email: string, password: string) => {
     try {
-      await loginMutation.mutateAsync({email, password});
-      return {success: true};
+      const response = await loginMutation.mutateAsync({email, password});
+
+      return response;
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Login failed';
       return {success: false, error: errorMessage};

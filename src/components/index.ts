@@ -6,6 +6,7 @@ export * from './Logo';
 export * from './Form';
 export * from './Icon';
 export * from './FormCard';
+export * from './CircularProgressBar';
 export * from './LinkLabel';
 export * from './AuthScreenWrapper';
 export * from './Divider';

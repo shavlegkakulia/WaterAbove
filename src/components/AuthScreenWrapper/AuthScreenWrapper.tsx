@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { spacing, KEYBOARD_AVOIDING_VIEW_BEHAVIOR } from '@/theme';
-import bgImage from '@/assets/bgbg.png';
+import bgImage from '@/assets/images/bgbg.png';
 
 export interface AuthScreenWrapperProps {
   children: React.ReactNode;

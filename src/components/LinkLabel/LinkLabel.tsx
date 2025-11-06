@@ -13,6 +13,7 @@ export interface LinkLabelProps extends TouchableOpacityProps {
   underline?: boolean;
   textStyle?: TextStyle;
   textVariant?: TypographyKey;
+  disabled?: boolean;
 }
 
 export const LinkLabel: React.FC<LinkLabelProps> = ({
@@ -22,17 +23,31 @@ export const LinkLabel: React.FC<LinkLabelProps> = ({
   underline,
   textStyle,
   textVariant = 'caption12Regular',
+  disabled = false,
+  onPress,
   ...rest
 }) => {
+  const handlePress = (e: any) => {
+    if (!disabled && onPress) {
+      onPress(e);
+    }
+  };
 
   return (
-    <TouchableOpacity style={[styles.container, style]} {...rest}>
+    <TouchableOpacity
+      style={[styles.container, style, disabled && styles.disabled]}
+      onPress={handlePress}
+      disabled={disabled}
+      activeOpacity={disabled ? 1 : 0.7}
+      {...rest}
+    >
       <Text
         variant={textVariant}
         color={color}
         style={[
           styles.text,
           underline && styles.underline,
+          disabled && styles.disabledText,
           textStyle,
         ]}
       >
@@ -54,5 +69,11 @@ const styles = StyleSheet.create({
   },
   underline: {
     textDecorationLine: 'underline',
+  },
+  disabled: {
+    opacity: 0.9,
+  },
+  disabledText: {
+    opacity: 0.9,
   },
 });

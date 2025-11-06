@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from "react-native";
 import { colors } from "@/theme";
 
 import { monthMap } from "./helpers";
@@ -31,7 +31,11 @@ export default function MonthList({
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      style={styles.scrollContainer}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       {monthMap.map((item, index) => (
         <TouchableOpacity
           disabled={isDisabled(index)}
@@ -49,24 +53,27 @@ export default function MonthList({
           </Text>
         </TouchableOpacity>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    maxHeight: moderateScale(280),
+    flexShrink: 0,
+  },
   container: {
-    paddingVertical: 12,
-    gap: 8,
+    paddingVertical: moderateScale(12),
+    gap: moderateScale(8),
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
   item: {
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingVertical: moderateScale(12),
+    paddingHorizontal: moderateScale(4),
     minWidth: "31%",
-    height: "100%",
-    maxHeight: moderateScale(70),
+    minHeight: moderateScale(60),
     borderWidth: 1,
     borderRadius: 6,
     borderColor: colors.gray200,
@@ -81,7 +88,7 @@ const styles = StyleSheet.create({
     color: colors.gray600,
   },
   isSelected: {
-    borderColor: colors.primary,
+    borderColor: "#46C2A3",
     backgroundColor: colors.gray50,
   },
   isDisabled: {

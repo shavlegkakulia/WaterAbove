@@ -96,7 +96,7 @@ const styleSheet = StyleSheet.create({
     justifyContent: "center",
   },
   highlight: {
-    borderColor: colors.accent,
+    borderColor: "#0369F1",
     borderWidth: 1,
   },
 
@@ -105,6 +105,6 @@ const styleSheet = StyleSheet.create({
   },
 
   selected: {
-    backgroundColor: colors.accent,
+    backgroundColor: "#0369F1",
   },
 });

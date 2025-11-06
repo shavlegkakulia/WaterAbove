@@ -15,13 +15,17 @@ export const uploadService = {
   uploadImage: async (file: FormData): Promise<UploadImageResponse> => {
     const response = await apiClient.post(API_ENDPOINTS.UPLOAD.IMAGE, file, {
       headers: {
-        // Don't set Content-Type - let axios handle it automatically for FormData
-        // It will set: 'multipart/form-data; boundary=...'
+        // Remove default Content-Type to let axios handle FormData automatically
+        // Axios will set: 'multipart/form-data; boundary=...'
+        'Content-Type': undefined,
       },
       transformRequest: (data) => {
         // Return FormData as-is - axios will handle it
         return data;
       },
+      // Skip request interceptor metadata for file uploads
+      // @ts-ignore
+      _skipMetadata: true,
     });
     return response.data;
   },

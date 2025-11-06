@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   isSelected: {
-    borderColor: colors.primary,
+    borderColor: "#46C2A3",
     backgroundColor: colors.gray50,
   },
   itemDisabled: {

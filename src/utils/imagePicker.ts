@@ -14,6 +14,7 @@ export interface ImagePickerResult {
   fileSize?: number;
   width?: number;
   height?: number;
+  base64?: string;
 }
 
 export interface ImagePickerError {
@@ -47,6 +48,7 @@ const processImageResponse = (
     fileSize: asset.fileSize,
     width: asset.width,
     height: asset.height,
+    base64: asset.base64,
   };
 };
 
@@ -60,7 +62,7 @@ const imageLibraryOptions: ImageLibraryOptions = {
   maxWidth: 1200,
   maxHeight: 1200,
   selectionLimit: 1,
-  includeBase64: false,
+  includeBase64: true, // Include base64 for displaying on WelcomeScreen
   presentationStyle: 'fullScreen',
 };
 
@@ -70,6 +72,7 @@ const cameraOptions: CameraOptions = {
   maxWidth: 1200,
   maxHeight: 1200,
   saveToPhotos: false,
+  includeBase64: true, // Include base64 for displaying on WelcomeScreen
 };
 
 /**

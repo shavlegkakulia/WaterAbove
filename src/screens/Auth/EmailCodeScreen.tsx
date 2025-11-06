@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, View, AppState, AppStateStatus } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -45,6 +45,13 @@ export const EmailCodeScreen: React.FC = () => {
 
   const email = route.params?.email || '';
 
+  // Countdown timer state (60 seconds = 1 minute)
+  const [countdown, setCountdown] = useState(60);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const countdownStartTimeRef = useRef<number | null>(null);
+  const remainingTimeRef = useRef<number>(60);
+
   const { control, handleSubmit } = useForm<CodeForm>({
     resolver: zodResolver(codeSchema),
     defaultValues: { code: '' },
@@ -60,6 +67,95 @@ export const EmailCodeScreen: React.FC = () => {
   const setAuthToken = useSetAtom(authTokenAtom);
   const setIsAuthenticated = useSetAtom(isAuthenticatedAtom);
   const setUser = useSetAtom(userAtom);
+
+  // Start countdown timer function (reusable)
+  const startCountdown = React.useCallback((initialSeconds: number = 60) => {
+    // Clear any existing interval
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    
+    // Reset countdown
+    remainingTimeRef.current = initialSeconds;
+    setCountdown(initialSeconds);
+    countdownStartTimeRef.current = Date.now();
+    
+    // Start new interval
+    countdownRef.current = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - (countdownStartTimeRef.current || Date.now())) / 1000);
+      const newCountdown = Math.max(0, initialSeconds - elapsed);
+      
+      setCountdown(newCountdown);
+      remainingTimeRef.current = newCountdown;
+      
+      if (newCountdown <= 0) {
+        if (countdownRef.current) {
+          clearInterval(countdownRef.current);
+          countdownRef.current = null;
+        }
+        countdownStartTimeRef.current = null;
+      }
+    }, 1000);
+  }, []);
+
+  // Handle app state changes (background/foreground)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+        // App has come to the foreground - recalculate countdown
+        if (countdownStartTimeRef.current !== null && remainingTimeRef.current > 0) {
+          const elapsed = Math.floor((Date.now() - countdownStartTimeRef.current) / 1000);
+          const remaining = Math.max(0, remainingTimeRef.current - elapsed);
+          
+          if (remaining > 0) {
+            // Resume countdown from remaining time
+            startCountdown(remaining);
+          } else {
+            // Countdown expired while in background
+            setCountdown(0);
+            remainingTimeRef.current = 0;
+            if (countdownRef.current) {
+              clearInterval(countdownRef.current);
+              countdownRef.current = null;
+            }
+            countdownStartTimeRef.current = null;
+          }
+        }
+      } else if (appStateRef.current === 'active' && nextAppState.match(/inactive|background/)) {
+        // App has gone to the background - save current state
+        // The interval will continue running, but we track elapsed time
+        if (countdownRef.current && countdownStartTimeRef.current !== null) {
+          // Time is already being tracked in countdownStartTimeRef
+          // Just pause the visual update (interval continues)
+        }
+      }
+      
+      appStateRef.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [startCountdown]);
+
+  // Start countdown timer when component mounts
+  useEffect(() => {
+    startCountdown(60);
+
+    return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
+    };
+  }, [startCountdown]);
+
+  // Format countdown as MM:SS
+  const formatCountdown = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const onSubmit = async (form: CodeForm) => {
     const response = await verifyCodeMutation.mutateAsync({
@@ -88,7 +184,16 @@ export const EmailCodeScreen: React.FC = () => {
   };
 
   const handleResend = async () => {
-    await verifyEmail(email);
+    if (countdown > 0) return; // Prevent resend if countdown is active
+    
+    const result = await verifyEmail(email);
+    if (result.success) {
+      showSuccess('Verification code sent!');
+      // Restart countdown timer
+      startCountdown();
+    } else {
+      showError(result.error || 'Failed to resend code. Please try again.');
+    }
   };
 
   const handleBack = () => navigation.navigate('Login');
@@ -126,8 +231,17 @@ export const EmailCodeScreen: React.FC = () => {
             containerStyle={styles.verifyButton}
           />
 
-          <LinkLabel onPress={handleResend} textVariant="caption12Regular" style={styles.resendButton}>
-            Resend Code
+          <LinkLabel
+            onPress={handleResend}
+            textVariant="caption12Regular"
+            style={[
+              styles.resendButton,
+              countdown > 0 && styles.resendButtonDisabled,
+            ]}
+            disabled={countdown > 0}
+            color={countdown > 0 ? 'textSecondary' : 'textWhiteWA'}
+          >
+            {countdown > 0 ? `Resend in ${formatCountdown(countdown)}` : 'Resend Code'}
           </LinkLabel>
         </View>
 
@@ -163,6 +277,9 @@ const styles = StyleSheet.create({
   resendButton: {
     marginTop: moderateScale(spacing.md),
     alignSelf: 'center',
+  },
+  resendButtonDisabled: {
+    opacity: 0.6,
   },
 });
 

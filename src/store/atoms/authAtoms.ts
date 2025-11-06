@@ -21,6 +21,20 @@ export const authTokenAtom = atomWithStorage<string | null>(
   createJSONStorage(() => AsyncStorage)
 );
 
+// Persisted refresh token (React Native AsyncStorage)
+export const refreshTokenAtom = atomWithStorage<string | null>(
+  'refresh_token',
+  null,
+  createJSONStorage(() => AsyncStorage)
+);
+
+// Token expiration timestamp (in milliseconds since epoch)
+export const tokenExpiryAtom = atomWithStorage<number | null>(
+  'token_expiry',
+  null,
+  createJSONStorage(() => AsyncStorage)
+);
+
 // Derived atom - check if user is logged in
 export const isLoggedInAtom = atom(
   (get) => get(isAuthenticatedAtom) && get(userAtom) !== null

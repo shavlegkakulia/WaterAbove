@@ -62,7 +62,7 @@ export const LoginScreen: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     const result = await login(data.email, data.password);
 
-    if (result.success) {
+    if (result?.success === true) {
       showSuccess('Welcome back!');
       // Navigation will be handled by auth state change
     } else {
@@ -71,7 +71,7 @@ export const LoginScreen: React.FC = () => {
   };
 
   const handleForgotPassword = () => {
-    console.log('Navigate to forgot password');
+    navigation.navigate('ForgotPassword');
   };
 
   const handleCreateAccount = () => {

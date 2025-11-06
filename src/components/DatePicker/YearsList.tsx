@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { Platform } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { FlatList } from "react-native";
 import { colors } from "@/theme";
 import RenderListItem from "./RenderListItem";
 import { yearsMap } from "./helpers";
+import { moderateScale } from "@/utils";
 
 type TYearsListProps = {
   currentMonth: number;
@@ -56,6 +57,14 @@ export default function YearsList({
       ref={YearsListRef}
       renderItem={renderItem}
       showsVerticalScrollIndicator={false}
+      style={styles.listContainer}
     />
   );
 }
+
+
+const styles = StyleSheet.create({
+  listContainer: {
+    maxHeight: moderateScale(300),
+  },
+});

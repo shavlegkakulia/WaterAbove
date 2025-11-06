@@ -1,6 +1,6 @@
 import React from 'react';
 import {ViewStyle} from 'react-native';
-import AppLogo from '@/assets/applogo.svg';
+import AppLogo from '@/assets/svg/applogo.svg';
 
 export interface LogoProps {
   size?: number;
