@@ -9,8 +9,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useAtomValue, useSetAtom} from 'jotai';
 import {toastsAtom, removeToastAtom} from '@/store/atoms';
 import {colors, spacing, borderRadius, shadows} from '@/theme';
-import {Text} from '@/components/Typography';
-import {Icon} from '@/components/Icon';
+import {Text} from '@/components/ui/Typography';
+import {Icon} from '@/components/ui/Icon';
 
 const ToastItem: React.FC<{
   id: string;

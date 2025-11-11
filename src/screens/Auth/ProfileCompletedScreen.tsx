@@ -3,8 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 import { CommonActions } from '@react-navigation/native';
 
-import { AuthScreenWrapper, Text } from '@/components';
-import { ProfileCompletedIcon } from '@/components/Icons/ProfileCompletedIcon';
+import { AuthScreenWrapper, ProfileCompletedIcon, Text } from '@/components';
 import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
 import { useAppNavigation, useAppRoute } from '@/navigation';

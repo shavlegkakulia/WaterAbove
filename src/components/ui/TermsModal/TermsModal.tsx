@@ -10,8 +10,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { borderRadius, colors, spacing } from '@/theme';
-import { Text } from '@/components/Typography';
-import { Button } from '@/components/Button';
+import { Text } from '@/components/ui/Typography';
+import { Button } from '@/components/ui/Button';
 import { moderateScale } from '@/utils';
 import { BlurView } from '@react-native-community/blur';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Controller, Control, FieldValues, Path} from 'react-hook-form';
-import {Input, InputProps} from '@/components/Input';
+import {Input, InputProps} from '@/components/ui/Input';
 
 export interface FormInputProps<T extends FieldValues>
   extends Omit<InputProps, 'value' | 'onChangeText' | 'state'> {

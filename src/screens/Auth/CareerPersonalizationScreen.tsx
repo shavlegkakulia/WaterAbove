@@ -11,19 +11,15 @@ import {
   Text,
   CircularProgressBar,
   FormInput,
-  SkipButton,
 } from '@/components';
-import { Icon } from '@/components/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
 import { useUpdateUserMutation, useUserQuery } from '@/api/query';
 import { useToast } from '@/store/hooks';
-import type {
-  ApiUser,
-  UserEmploymentStatus,
-  UserLevelOfEducation,
-} from '@/api/types';
+import type { UserEmploymentStatus, UserLevelOfEducation } from '@/api/types';
 import { useAppNavigation, useAppRoute } from '@/navigation';
+import { getAgeFromProfile, isUnderMinimumAge } from '@/utils/profile';
 
 const careerPersonalizationSchema = z.object({
   employmentStatus: z.array(z.string()).optional(),
@@ -36,7 +32,10 @@ type CareerPersonalizationFormData = z.infer<
   typeof careerPersonalizationSchema
 >;
 
-const EMPLOYMENT_STATUS_OPTIONS: Array<{ value: UserEmploymentStatus; label: string }> = [
+const EMPLOYMENT_STATUS_OPTIONS: Array<{
+  value: UserEmploymentStatus;
+  label: string;
+}> = [
   { value: 'prefer-not-to-say', label: 'Prefer not to say' },
   { value: 'entrepreneur', label: 'Entrepreneur' },
   { value: 'self-employed', label: 'Self-Employed' },
@@ -50,7 +49,10 @@ const EMPLOYMENT_STATUS_OPTIONS: Array<{ value: UserEmploymentStatus; label: str
   { value: 'unemployed', label: 'Unemployed' },
 ];
 
-const EDUCATION_LEVEL_OPTIONS: Array<{ value: UserLevelOfEducation; label: string }> = [
+const EDUCATION_LEVEL_OPTIONS: Array<{
+  value: UserLevelOfEducation;
+  label: string;
+}> = [
   { value: 'prefer-not-to-say', label: 'Prefer not to say' },
   { value: 'no-formal-education', label: 'No Formal Education' },
   { value: 'some-high-school', label: 'Some High School' },
@@ -63,32 +65,6 @@ const EDUCATION_LEVEL_OPTIONS: Array<{ value: UserLevelOfEducation; label: strin
   { value: 'trade-technical', label: 'Trade / Technical' },
 ];
 
-const getAgeFromProfile = (
-  profile?: ApiUser['profile'] | null,
-): number | null => {
-  const dob = profile?.dateOfBirth;
-  if (!dob) {
-    return null;
-  }
-
-  const parsed = new Date(dob);
-  if (Number.isNaN(parsed.getTime())) {
-    return null;
-  }
-
-  const today = new Date();
-  let age = today.getFullYear() - parsed.getFullYear();
-  const monthDiff = today.getMonth() - parsed.getMonth();
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < parsed.getDate())
-  ) {
-    age -= 1;
-  }
-
-  return age;
-};
-
 export const CareerPersonalizationScreen: React.FC = () => {
   const navigation = useAppNavigation<'CareerPersonalization'>();
   const route = useAppRoute<'CareerPersonalization'>();
@@ -99,14 +75,13 @@ export const CareerPersonalizationScreen: React.FC = () => {
   const emailFromParams = route.params?.email;
   const initialPercentage = route.params?.profileCompletionPercentage ?? 80;
   const userProfileFromRoute = route.params?.userProfile;
-  const [profileCompletionPercentage, setProfileCompletionPercentage] = useState(initialPercentage);
+  const [profileCompletionPercentage, setProfileCompletionPercentage] =
+    useState(initialPercentage);
 
   const canGoBack = navigation.canGoBack();
 
   const userProfile = useMemo(() => {
-    return (
-      userProfileFromRoute || userData?.data?.user?.profile || null
-    );
+    return userProfileFromRoute || userData?.data?.user?.profile || null;
   }, [userData, userProfileFromRoute]);
 
   const {
@@ -207,18 +182,15 @@ export const CareerPersonalizationScreen: React.FC = () => {
         profileData: {
           profileCompletionPercentage: 90,
           employmentStatus:
-            formData.employmentStatus &&
-            formData.employmentStatus.length > 0
+            formData.employmentStatus && formData.employmentStatus.length > 0
               ? (formData.employmentStatus as UserEmploymentStatus[])
               : undefined,
           educationLevel:
             formData.educationLevel && formData.educationLevel.length > 0
               ? formData.educationLevel
               : undefined,
-          educationField:
-            trimmedField.length > 0 ? trimmedField : undefined,
-          educationSchool:
-            trimmedSchool.length > 0 ? trimmedSchool : undefined,
+          educationField: trimmedField.length > 0 ? trimmedField : undefined,
+          educationSchool: trimmedSchool.length > 0 ? trimmedSchool : undefined,
         },
       });
 
@@ -240,7 +212,7 @@ export const CareerPersonalizationScreen: React.FC = () => {
           userData?.data?.user?.profile ??
           null;
         const age = getAgeFromProfile(targetProfile);
-        const shouldSkipLifestyle = age !== null && age < 18;
+        const shouldSkipLifestyle = isUnderMinimumAge(age);
 
         if (shouldSkipLifestyle) {
           navigation.navigate('ProfileCompleted', {
@@ -261,14 +233,13 @@ export const CareerPersonalizationScreen: React.FC = () => {
   };
 
   const handleSkip = () => {
-    const resolvedEmail =
-      emailFromParams ?? userData?.data?.user?.email ?? '';
+    const resolvedEmail = emailFromParams ?? userData?.data?.user?.email ?? '';
 
     const age = getAgeFromProfile(
       userProfile ?? userData?.data?.user?.profile ?? null,
     );
 
-    if (age !== null && age < 18) {
+    if (isUnderMinimumAge(age)) {
       navigation.navigate('ProfileCompleted', {
         email: resolvedEmail,
       });
@@ -336,17 +307,25 @@ export const CareerPersonalizationScreen: React.FC = () => {
               contentContainerStyle={styles.horizontalScroll}
             >
               {EMPLOYMENT_STATUS_OPTIONS.map(option => {
-                const isSelected = selectedEmploymentStatus.includes(option.value);
+                const isSelected = selectedEmploymentStatus.includes(
+                  option.value,
+                );
                 return (
                   <TouchableOpacity
                     key={option.value}
-                    style={[styles.pillButton, isSelected && styles.pillButtonSelected]}
+                    style={[
+                      styles.pillButton,
+                      isSelected && styles.pillButtonSelected,
+                    ]}
                     onPress={() => handleEmploymentStatusToggle(option.value)}
                     activeOpacity={0.7}
                   >
                     <Text
                       variant="label14Medium"
-                      style={[styles.pillButtonText, isSelected && styles.pillButtonTextSelected]}
+                      style={[
+                        styles.pillButtonText,
+                        isSelected && styles.pillButtonTextSelected,
+                      ]}
                     >
                       {option.label}
                     </Text>
@@ -354,7 +333,6 @@ export const CareerPersonalizationScreen: React.FC = () => {
                 );
               })}
             </ScrollView>
- 
           </View>
 
           <View style={styles.section}>
@@ -371,13 +349,19 @@ export const CareerPersonalizationScreen: React.FC = () => {
                 return (
                   <TouchableOpacity
                     key={option.value}
-                    style={[styles.pillButton, isSelected && styles.pillButtonSelected]}
+                    style={[
+                      styles.pillButton,
+                      isSelected && styles.pillButtonSelected,
+                    ]}
                     onPress={() => handleEducationLevelSelect(option.value)}
                     activeOpacity={0.7}
                   >
                     <Text
                       variant="body16Regular"
-                      style={[styles.pillButtonText, isSelected && styles.pillButtonTextSelected]}
+                      style={[
+                        styles.pillButtonText,
+                        isSelected && styles.pillButtonTextSelected,
+                      ]}
                     >
                       {option.label}
                     </Text>
@@ -422,15 +406,18 @@ export const CareerPersonalizationScreen: React.FC = () => {
             />
           </View>
 
-          <SkipButton
-            style={styles.skipButton}
-            variant="secondary"
+          <Button
+            title="Skip for now"
             onPress={handleSkip}
+            variant="ghost"
+            size="small"
+            containerStyle={styles.skipButton}
+            disabled={isSubmitting || updateUserMutation.isPending}
           />
 
           <Text variant="caption12Regular" style={styles.footerText}>
-            Complete your Profile to receive a Verified Badge to unlock access for posting in our
-            University Portal
+            Complete your Profile to receive a Verified Badge to unlock access
+            for posting in our University Portal
           </Text>
         </ScrollView>
       </FormCard>
@@ -547,14 +534,15 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: moderateScale(spacing.xl),
     marginTop: moderateScale(31),
-    marginBottom: moderateScale(spacing.lg),
   },
   button: {
     width: '100%',
   },
   skipButton: {
-    alignSelf: 'center',
-    marginBottom: moderateScale(spacing.md),
+    marginHorizontal: moderateScale(spacing.xl),
+    height: moderateScale(40),
+    marginTop: moderateScale(13),
+    marginBottom: moderateScale(14),
   },
   footerText: {
     textAlign: 'center',
@@ -564,5 +552,3 @@ const styles = StyleSheet.create({
 });
 
 export default CareerPersonalizationScreen;
-
-

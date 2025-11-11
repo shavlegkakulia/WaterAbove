@@ -1,7 +1,7 @@
 import React from 'react';
 import {Controller, Control, FieldValues, Path} from 'react-hook-form';
-import {Checkbox, CheckboxProps} from '@/components/Checkbox';
-import {Text} from '@/components/Typography';
+import {Checkbox, CheckboxProps} from '@/components/ui/Checkbox';
+import {Text} from '@/components/ui/Typography';
 import {View, StyleSheet} from 'react-native';
 import {spacing} from '@/theme';
 

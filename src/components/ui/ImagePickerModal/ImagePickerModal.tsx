@@ -7,8 +7,8 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { colors, spacing } from '@/theme';
-import { Text } from '@/components/Typography';
-import { Icon } from '@/components/Icon';
+import { Text } from '@/components/ui/Typography';
+import { Icon } from '@/components/ui/Icon';
 import { moderateScale } from '@/utils';
 
 export interface ImagePickerModalProps {

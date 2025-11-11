@@ -12,8 +12,9 @@ import {
   CircularProgressBar,
   FormInput,
   Switch,
+  OptionPill,
 } from '@/components';
-import { Icon } from '@/components/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
 import { useUpdateUserMutation, useUserQuery } from '@/api/query';
@@ -81,9 +82,7 @@ export const LifestylePersonalizationScreen: React.FC = () => {
   const canGoBack = navigation.canGoBack();
 
   const userProfile = useMemo(() => {
-    return (
-      userProfileFromRoute || userData?.data?.user?.profile || null
-    );
+    return userProfileFromRoute || userData?.data?.user?.profile || null;
   }, [userData, userProfileFromRoute]);
 
   const {
@@ -231,6 +230,14 @@ export const LifestylePersonalizationScreen: React.FC = () => {
     }
   };
 
+  const handleSkip = () => {
+    const resolvedEmail = emailFromParams ?? userData?.data?.user?.email ?? '';
+
+    navigation.navigate('ProfileCompleted', {
+      email: resolvedEmail,
+    });
+  };
+
   return (
     <AuthScreenWrapper>
       <FormCard style={styles.card} hasHorizontalPadding={false}>
@@ -287,25 +294,14 @@ export const LifestylePersonalizationScreen: React.FC = () => {
               {RELATIONSHIP_STATUS_OPTIONS.map(option => {
                 const isSelected = selectedRelationship === option.value;
                 return (
-                  <TouchableOpacity
+                  <OptionPill
                     key={option.value}
-                    style={[
-                      styles.pillButton,
-                      isSelected && styles.pillButtonSelected,
-                    ]}
+                    label={option.label}
+                    selected={isSelected}
                     onPress={() => handleRelationshipSelect(option.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      variant="label14Medium"
-                      style={[
-                        styles.pillButtonText,
-                        isSelected && styles.pillButtonTextSelected,
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
+                    labelVariant="label14Medium"
+                    style={styles.optionPill}
+                  />
                 );
               })}
             </ScrollView>
@@ -387,11 +383,13 @@ export const LifestylePersonalizationScreen: React.FC = () => {
             </View>
           </View>
 
-        
-            <Text variant="paragraph14Bold" style={[styles.sectionTitle, styles.sectionSubtitle]}>
-              Kids?
-            </Text>
-            <View style={styles.section}>
+          <Text
+            variant="paragraph14Bold"
+            style={[styles.sectionTitle, styles.sectionSubtitle]}
+          >
+            Kids?
+          </Text>
+          <View style={styles.section}>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -400,25 +398,14 @@ export const LifestylePersonalizationScreen: React.FC = () => {
               {KIDS_OPTIONS.map(option => {
                 const isSelected = selectedKids === option.value;
                 return (
-                  <TouchableOpacity
+                  <OptionPill
                     key={option.value}
-                    style={[
-                      styles.pillButton,
-                      isSelected && styles.pillButtonSelected,
-                    ]}
+                    label={option.label}
+                    selected={isSelected}
                     onPress={() => handleKidsSelect(option.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      variant="body16Regular"
-                      style={[
-                        styles.pillButtonText,
-                        isSelected && styles.pillButtonTextSelected,
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
+                    labelVariant="body16Regular"
+                    style={styles.optionPill}
+                  />
                 );
               })}
             </ScrollView>
@@ -436,7 +423,14 @@ export const LifestylePersonalizationScreen: React.FC = () => {
               }
             />
           </View>
-
+          <Button
+            title="Skip for now"
+            onPress={handleSkip}
+            variant="ghost"
+            size="small"
+            containerStyle={styles.skipButton}
+            disabled={isSubmitting || updateUserMutation.isPending}
+          />
           <Text variant="caption12Regular" style={styles.footerText}>
             Complete your Profile to receive a Verified Badge to unlock access
             for posting in our University Portal
@@ -488,7 +482,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   scrollContent: {
-    paddingBottom: moderateScale(24),
+    marginBottom: moderateScale(34),
   },
   title: {
     textAlign: 'center',
@@ -514,27 +508,8 @@ const styles = StyleSheet.create({
   horizontalScroll: {
     paddingHorizontal: moderateScale(spacing.xl),
   },
-  pillButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: moderateScale(spacing.sm),
-    paddingHorizontal: moderateScale(spacing.md),
-    borderRadius: moderateScale(30),
-    borderWidth: 1,
-    borderColor: '#5883EA',
-    backgroundColor: 'transparent',
+  optionPill: {
     marginRight: moderateScale(spacing.sm),
-    minHeight: moderateScale(40),
-  },
-  pillButtonSelected: {
-    borderColor: '#47ECC3',
-    backgroundColor: '#C7DBD6',
-  },
-  pillButtonText: {
-    color: colors.textWhiteWA,
-  },
-  pillButtonTextSelected: {
-    color: colors.black,
   },
   inputSection: {
     width: '100%',
@@ -576,11 +551,16 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     paddingHorizontal: moderateScale(spacing.xl),
-    marginBottom: moderateScale(spacing.xl),
     marginTop: moderateScale(18),
   },
   button: {
     width: '100%',
+  },
+  skipButton: {
+    marginHorizontal: moderateScale(spacing.xl),
+    height: moderateScale(40),
+    marginTop: moderateScale(6),
+    marginBottom: moderateScale(5),
   },
   footerText: {
     textAlign: 'center',

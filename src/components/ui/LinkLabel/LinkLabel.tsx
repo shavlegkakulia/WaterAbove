@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TextStyle,
 } from 'react-native';
-import { Text } from '@/components/Typography';
+import { Text } from '@/components/ui/Typography';
 import { ColorKey, TypographyKey } from '@/theme';
 export interface LinkLabelProps extends TouchableOpacityProps {
   color?: ColorKey;

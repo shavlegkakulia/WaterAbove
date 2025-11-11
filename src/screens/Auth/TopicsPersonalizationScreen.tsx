@@ -12,9 +12,9 @@ import {
   CircularProgressBar,
   FormInput,
   Switch,
-  SkipButton,
+  OptionPill,
 } from '@/components';
-import { Icon } from '@/components/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
 import { useUpdateUserMutation, useUserQuery } from '@/api/query';
@@ -321,31 +321,14 @@ export const TopicsPersonalizationScreen: React.FC = () => {
               {TOPIC_OPTIONS.map(option => {
                 const isSelected = selectedTopics.includes(option.value);
                 return (
-                  <TouchableOpacity
+                  <OptionPill
                     key={option.value}
-                    style={[
-                      styles.pillButton,
-                      isSelected && styles.pillButtonSelected,
-                    ]}
+                    label={option.label}
+                    emoji={option.emoji}
+                    labelVariant="label14Medium"
+                    selected={isSelected}
                     onPress={() => handleTopicSelect(option.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      variant="label14Medium"
-                      style={styles.pillButtonEmoji}
-                    >
-                      {option.emoji}
-                    </Text>
-                    <Text
-                      variant="label14Medium"
-                      style={[
-                        styles.pillButtonText,
-                        isSelected && styles.pillButtonTextSelected,
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
+                  />
                 );
               })}
             </ScrollView>
@@ -455,8 +438,14 @@ export const TopicsPersonalizationScreen: React.FC = () => {
               disabled={isSubmitting || updateUserMutation.isPending}
             />
           </View>
-
-          <SkipButton onPress={handleSkip} />
+          <Button
+              title="Skip for now"
+              onPress={handleSkip}
+              variant="ghost"
+              size="small"
+              containerStyle={styles.skipButton}
+              disabled={isSubmitting || updateUserMutation.isPending}
+            />
 
           <Text variant="caption12Regular" style={styles.footerText}>
             Complete your Profile to receive a Verified Badge to unlock access
@@ -541,30 +530,6 @@ const styles = StyleSheet.create({
   horizontalScroll: {
     paddingHorizontal: moderateScale(spacing.xl),
   },
-  pillButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: moderateScale(spacing.md),
-    borderRadius: moderateScale(30),
-    borderWidth: 1,
-    borderColor: '#5883EA',
-    backgroundColor: 'transparent',
-    marginRight: moderateScale(spacing.sm),
-    minHeight: moderateScale(40),
-  },
-  pillButtonSelected: {
-    borderColor: '#47ECC3',
-    backgroundColor: '#C7DBD6',
-  },
-  pillButtonText: {
-    color: colors.textWhiteWA,
-  },
-  pillButtonTextSelected: {
-    color: colors.black,
-  },
-  pillButtonEmoji: {
-    marginRight: moderateScale(spacing.xs),
-  },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#DBDBDB',
@@ -601,10 +566,15 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: moderateScale(spacing.xl),
     marginTop: moderateScale(spacing.md),
-    marginBottom: moderateScale(spacing.xl),
   },
   button: {
     width: '100%',
+  },
+  skipButton: {
+    marginHorizontal: moderateScale(spacing.xl),
+    height: moderateScale(40),
+    marginTop: moderateScale(spacing.sm),
+    marginBottom: moderateScale(5),
   },
   footerText: {
     textAlign: 'center',

@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {colors, spacing, shadows, borderRadius} from '@/theme';
-import {Text} from '@/components/Typography';
+import {Text} from '@/components/ui/Typography';
 import { moderateScale } from '@/utils';
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 export type ButtonSize = 'small' | 'medium' | 'large';

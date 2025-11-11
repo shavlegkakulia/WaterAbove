@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {colors, spacing, borderRadius, fontSize} from '@/theme';
-import {Text} from '@/components/Typography';
+import {Text} from '@/components/ui/Typography';
 import { moderateScale } from '@/utils';
 
 export type InputState = 'default' | 'focused' | 'success' | 'error' | 'disabled';

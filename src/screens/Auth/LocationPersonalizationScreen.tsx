@@ -7,7 +7,7 @@ import { FormCard, FormInput, Button, Text, AuthScreenWrapper, CircularProgressB
 import { colors, fontSize, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
 import MapSvg from '@/assets/svg/map.svg';
-import { Icon } from '@/components/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { useLocationAutocomplete } from '@/hooks/useLocationAutocomplete';
 import { useLocationMemberCountsMutation, useUpdateUserLocationMutation, useUpdateUserMutation } from '@/api/query';
 import type {

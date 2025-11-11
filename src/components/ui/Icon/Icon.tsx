@@ -8,7 +8,7 @@ import type { LucideProps } from 'lucide-react-native';
  * Wraps lucide-react-native icons for consistent usage across the app
  * 
  * @example
- * import { Icon } from '@/components/Icon';
+ * import { Icon } from '@/components/ui/Icon';
  * 
  * <Icon name="Home" size={24} color="#000" />
  * <Icon name="User" size={32} strokeWidth={2.5} />

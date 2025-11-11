@@ -10,14 +10,20 @@ import {
   AuthScreenWrapper,
   CircularProgressBar,
   Switch,
+  OptionPill,
 } from '@/components';
 import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
-import { Icon } from '@/components/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { useUpdateUserMutation, useUserQuery } from '@/api/query';
 import { useToast } from '@/store/hooks';
 import type { UserPurpose, UserGender, UserZodiacSign } from '@/api/types';
 import { useAppNavigation, useAppRoute } from '@/navigation';
+import {
+  calculateAge,
+  isUnderMinimumAge,
+  parseDateOfBirth,
+} from '@/utils/profile';
 
 // Validation schema
 const profilePersonalizationSchema = z.object({
@@ -75,59 +81,6 @@ const PURPOSE_OPTIONS: Array<{
   { value: 'making-friends', label: 'Making Friends', emoji: '👥' },
   { value: 'dating', label: 'Dating', emoji: '💕' },
 ];
-
-const MINIMUM_AGE_FOR_DATING = 18;
-
-const parseDateOfBirth = (dateOfBirth?: string | null): Date | null => {
-  if (!dateOfBirth) {
-    return null;
-  }
-
-  const directDate = new Date(dateOfBirth);
-  if (!Number.isNaN(directDate.getTime())) {
-    return directDate;
-  }
-
-  const normalizedDob = dateOfBirth.replace(/\./g, '-').replace(/\//g, '-');
-  const parts = normalizedDob.split('-').map(part => part.trim());
-
-  if (parts.length === 3) {
-    const [first, second, third] = parts;
-
-    const isDayFirst = Number(first) <= 31 && Number(second) <= 12;
-    const day = Number(isDayFirst ? first : second);
-    const month = Number(isDayFirst ? second : first);
-    const year = Number(third.length === 4 ? third : third.padStart(4, '20'));
-
-    if (
-      Number.isFinite(day) &&
-      Number.isFinite(month) &&
-      Number.isFinite(year)
-    ) {
-      const candidate = new Date(year, month - 1, day);
-      if (!Number.isNaN(candidate.getTime())) {
-        return candidate;
-      }
-    }
-  }
-
-  return null;
-};
-
-const calculateAge = (date: Date): number => {
-  const today = new Date();
-  let age = today.getFullYear() - date.getFullYear();
-  const monthDiff = today.getMonth() - date.getMonth();
-
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < date.getDate())
-  ) {
-    age -= 1;
-  }
-
-  return age;
-};
 
 const formatDateForDisplay = (date: Date): string => {
   const months = [
@@ -198,7 +151,7 @@ export const ProfilePersonalizationScreen: React.FC = () => {
     if (calculatedAge === null) {
       return false;
     }
-    return calculatedAge < MINIMUM_AGE_FOR_DATING;
+    return isUnderMinimumAge(calculatedAge);
   }, [calculatedAge]);
 
   // Load user profile data on mount
@@ -216,7 +169,7 @@ export const ProfilePersonalizationScreen: React.FC = () => {
 
       setCalculatedAge(nextAge);
 
-      const underage = nextAge !== null && nextAge < MINIMUM_AGE_FOR_DATING;
+      const underage = isUnderMinimumAge(nextAge);
 
       // Set zodiac sign
       if (userProfile.zodiacSign) {
@@ -476,29 +429,18 @@ export const ProfilePersonalizationScreen: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
           >
-            {ZODIAC_SIGNS.map((sign) => (
-              <TouchableOpacity
+            {ZODIAC_SIGNS.map(sign => (
+              <OptionPill
                 key={sign.value}
-                style={[
-                  styles.pillButton,
-                  zodiacSign === sign.value && styles.pillButtonSelected,
-                ]}
+                label={sign.label}
+                emoji={sign.symbol}
+                selected={zodiacSign === sign.value}
                 onPress={() => handleZodiacSignSelect(sign.value)}
-                activeOpacity={0.7}
-              >
-                <Text variant="paragraph14Regular" style={styles.pillButtonSymbol}>
-                  {sign.symbol}
-                </Text>
-                <Text
-                  variant="paragraph14Regular"
-                  style={[
-                    styles.pillButtonText,
-                    zodiacSign === sign.value && styles.pillButtonTextSelected,
-                  ]}
-                >
-                  {sign.label}
-                </Text>
-              </TouchableOpacity>
+                labelVariant="paragraph14Regular"
+                emojiVariant="paragraph14Regular"
+                emojiStyle={styles.pillButtonSymbol}
+                style={styles.optionPill}
+              />
             ))}
           </ScrollView>
         </View>
@@ -513,26 +455,15 @@ export const ProfilePersonalizationScreen: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
           >
-            {GENDER_OPTIONS.map((option) => (
-              <TouchableOpacity
+            {GENDER_OPTIONS.map(option => (
+              <OptionPill
                 key={option.value}
-                style={[
-                  styles.pillButton,
-                  gender === option.value && styles.pillButtonSelected,
-                ]}
+                label={option.label}
+                selected={gender === option.value}
                 onPress={() => handleGenderSelect(option.value)}
-                activeOpacity={0.7}
-              >
-                <Text
-                  variant="body16Regular"
-                  style={[
-                    styles.pillButtonText,
-                    gender === option.value && styles.pillButtonTextSelected,
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
+                labelVariant="body16Regular"
+                style={styles.optionPill}
+              />
             ))}
           </ScrollView>
         </View>
@@ -554,34 +485,20 @@ export const ProfilePersonalizationScreen: React.FC = () => {
           >
             {availablePurposeOptions.map(option => {
               const isSelected = purpose.includes(option.value);
-              const isDisabled =
-                isUnderage && option.value === 'dating';
+              const isDisabled = isUnderage && option.value === 'dating';
               return (
-                <TouchableOpacity
+                <OptionPill
                   key={option.value}
-                  style={[
-                    styles.pillButton,
-                    isSelected && styles.pillButtonSelected,
-                    isDisabled && styles.pillButtonDisabled,
-                  ]}
-                  onPress={() => handlePurposeSelect(option.value)}
-                  activeOpacity={0.7}
+                  label={option.label}
+                  emoji={option.emoji}
+                  selected={isSelected}
                   disabled={isDisabled}
-                >
-                  <Text variant="body16Regular" style={styles.pillButtonEmoji}>
-                    {option.emoji}
-                  </Text>
-                  <Text
-                    variant="body16Regular"
-                    style={[
-                      styles.pillButtonText,
-                      isSelected && styles.pillButtonTextSelected,
-                      isDisabled && styles.pillButtonTextDisabled,
-                    ]}
-                  >
-                    {option.label}
-                  </Text>
-                </TouchableOpacity>
+                  onPress={() => handlePurposeSelect(option.value)}
+                  labelVariant="body16Regular"
+                  emojiVariant="body16Regular"
+                  emojiStyle={styles.pillButtonEmoji}
+                  style={styles.optionPill}
+                />
               );
             })}
           </ScrollView>
@@ -696,30 +613,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(spacing.xl),
     marginBottom: moderateScale(22),
   },
-  pillButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: moderateScale(spacing.sm),
-    paddingHorizontal: moderateScale(spacing.md),
-    borderRadius: moderateScale(30),
-    borderWidth: 1,
-    borderColor: '#5883EA',
-    backgroundColor: 'transparent',
+  optionPill: {
     marginRight: moderateScale(spacing.md),
-    minHeight: moderateScale(40),
-  },
-  pillButtonSelected: {
-    borderColor: '#47ECC3',
-    backgroundColor: '#C7DBD6',
-  },
-  pillButtonDisabled: {
-    opacity: 0.5,
-  },
-  pillButtonText: {
-    color: colors.white,
-  },
-  pillButtonTextSelected: {
-    color: colors.black,
   },
   pillButtonSymbol: {
     color: '#D6E7E3',
@@ -728,7 +623,6 @@ const styles = StyleSheet.create({
   },
   pillButtonEmoji: {
     fontSize: moderateScale(16),
-    marginRight: moderateScale(spacing.xs),
   },
   helpText: {
     color: colors.white,
@@ -736,9 +630,6 @@ const styles = StyleSheet.create({
     marginTop: -moderateScale(16),
     paddingHorizontal: moderateScale(spacing.xl),
     textAlign: 'center',
-  },
-  pillButtonTextDisabled: {
-    color: '#9FA9C5',
   },
   errorText: {
     color: '#EF4444',

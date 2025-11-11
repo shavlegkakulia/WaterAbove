@@ -7,7 +7,7 @@ import {
   TextStyle,
 } from 'react-native';
 import {colors, spacing, TypographyKey} from '@/theme';
-import {Text} from '@/components/Typography';
+import {Text} from '@/components/ui/Typography';
 import { moderateScale } from '@/utils';
 
 export type CheckboxSize = 14 | 16 | 18 | 20 | 22 | 24;
