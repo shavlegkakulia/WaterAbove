@@ -411,6 +411,23 @@ export interface UpdateUserRequest {
     showDob?: boolean;
     isOnMemberMap?: boolean;
     shareLocation?: boolean;
+    isInterestedInBeingAMentor?: boolean;
+    isInterestedInBeingMentored?: boolean;
+    isInterestedInFindingAnAccountabilityPartner?: boolean;
+    shareTravelLocation?: boolean;
+    travelLocation?: string | null;
+    topicsThatMatter?: string[];
+    employmentStatus?: string[];
+    educationLevel?: string;
+    educationField?: string;
+    educationSchool?: string;
+    relationshipStatus?: string;
+    interestedIn?: string;
+    height?: number;
+    weight?: number;
+    doesSmoke?: boolean;
+    doesDrink?: boolean;
+    opinionOnHavingChildren?: string;
     street?: string;
     postalCode?: string;
     termsAcceptedAt?: number;
@@ -523,30 +540,72 @@ export interface PaginatedResponse<T> {
 // ============================================================================
 
 export interface LocationAutocompleteRequest {
-  limit: number;
-  q: string;
+  input: string;
+  limit?: number;
 }
 
-export interface LocationCity {
+export interface LocationMatchContinent {
   id: string;
   name: string;
-  countryId: string;
-  countryName: string;
-  countryCode: string;
-  continentId: string;
-  continentName: string;
-  continentCode: string;
-  regionId: string;
-  regionName: string;
-  regionCode: string | null;
-  formattedAddress: string;
+  code?: string | null;
 }
 
-export interface LocationAutocompleteResponse {
-  cities: LocationCity[];
+export interface LocationMatchCountry {
+  id: string;
+  name: string;
+  code?: string | null;
+  continentId?: string | null;
 }
 
-export type LocationAutocompleteApiResponse = ApiSuccessResponse<LocationAutocompleteResponse>;
+export interface LocationMatchRegion {
+  id: string;
+  name: string;
+  code?: string | null;
+  countryId?: string | null;
+  countryName?: string | null;
+}
+
+export interface LocationMatchCity {
+  id: string;
+  name: string;
+  countryId?: string | null;
+  countryName?: string | null;
+  regionId?: string | null;
+  code?: string | null;
+}
+
+export interface LocationMatch {
+  continent?: LocationMatchContinent;
+  country?: LocationMatchCountry;
+  region?: LocationMatchRegion;
+  city?: LocationMatchCity;
+}
+
+export interface LocationAutocompleteSuggestion {
+  description: string;
+  placeId: string;
+  types?: string[];
+  matchedSubstrings?: Array<{ length: number; offset: number }>;
+  structuredFormatting?: {
+    mainText: string;
+    secondaryText?: string;
+  };
+  terms?: Array<{ offset: number; value: string }>;
+  formattedAddress?: string;
+  location?: {
+    lat: number;
+    lng: number;
+  };
+  addressComponents?: Array<{
+    longName: string;
+    shortName: string;
+    types: string[];
+  }>;
+  locationMatch?: LocationMatch;
+}
+
+export type LocationAutocompleteApiResponse =
+  ApiSuccessResponse<LocationAutocompleteSuggestion[]>;
 
 export interface LocationMemberCountsRequest {
   cityId?: string;

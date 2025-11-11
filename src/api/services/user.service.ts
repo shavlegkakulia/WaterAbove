@@ -1,13 +1,13 @@
-import {apiClient} from '../client';
-import {API_ENDPOINTS} from '../endpoints';
+import { apiClient } from '../client';
+import { API_ENDPOINTS } from '../endpoints';
 import type {
-  User,
   CheckUsernameAvailabilityRequest,
   CheckUsernameAvailabilityResponse,
   AcceptTermsRequest,
   AcceptTermsResponse,
   UpdateUserRequest,
   UpdateUserResponse,
+  AuthStatusResponse,
 } from '../types';
 
 /**
@@ -18,8 +18,10 @@ export const userService = {
   /**
    * Get current user profile
    */
-  getMe: async (): Promise<User> => {
-    const response = await apiClient.get(API_ENDPOINTS.USER.ME);
+  getMe: async (): Promise<AuthStatusResponse> => {
+    const response = await apiClient.get<AuthStatusResponse>(
+      API_ENDPOINTS.AUTH.STATUS,
+    );
     return response.data;
   },
 

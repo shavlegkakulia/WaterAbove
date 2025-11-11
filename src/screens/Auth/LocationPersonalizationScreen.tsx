@@ -1,20 +1,23 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Switch, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import type { RouteProp } from '@react-navigation/native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FormCard, FormInput, Button, Text, AuthScreenWrapper, CircularProgressBar } from '@/components';
-import { spacing } from '@/theme';
+import { FormCard, FormInput, Button, Text, AuthScreenWrapper, CircularProgressBar, Switch } from '@/components';
+import { colors, fontSize, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
-import type { RootStackParamList } from '@/navigation/types';
 import MapSvg from '@/assets/svg/map.svg';
 import { Icon } from '@/components/Icon';
 import { useLocationAutocomplete } from '@/hooks/useLocationAutocomplete';
 import { useLocationMemberCountsMutation, useUpdateUserLocationMutation, useUpdateUserMutation } from '@/api/query';
-import type { LocationCity, LocationMemberCount, LocationMemberCountsResponse } from '@/api/types';
+import type {
+  LocationAutocompleteSuggestion,
+  LocationMemberCount,
+  LocationMemberCountsResponse,
+  LocationMatch,
+} from '@/api/types';
 import { useToast } from '@/store/hooks';
+import { useAppNavigation, useAppRoute } from '@/navigation';
 
 // Validation schema
 const locationSchema = z.object({
@@ -24,8 +27,8 @@ const locationSchema = z.object({
 type LocationFormData = z.infer<typeof locationSchema>;
 
 export const LocationPersonalizationScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const route = useRoute<RouteProp<RootStackParamList, 'LocationPersonalization'>>();
+  const navigation = useAppNavigation<'LocationPersonalization'>();
+  const route = useAppRoute<'LocationPersonalization'>();
   const email = route.params?.email || '';
 
   const userLocation = route.params?.userLocation;
@@ -35,16 +38,14 @@ export const LocationPersonalizationScreen: React.FC = () => {
 
   const [shareLocationOnProfile, setShareLocationOnProfile] = useState(userLocation?.showOnProfile || false);
   const [memberMap, setMemberMap] = useState(false);
-  const [subscribe, setSubscribe] = useState(userLocation?.subscribeToMemberMap || false);
+  const [subscribe, setSubscribe] = useState(true);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<LocationCity | null>(null);
-  const [memberCounts, setMemberCounts] = useState<LocationMemberCount[]>([]);
-  const [subscribeSwitches, setSubscribeSwitches] = useState<Record<string, boolean>>({
-    continent: userLocation?.subscribeToContinentGroup || false,
-    country: userLocation?.subscribeToCountryGroup || false,
-    region: userLocation?.subscribeToRegionGroup || false,
-    city: userLocation?.subscribeToCityGroup || false,
-  });
+  const [selectedLocation, setSelectedLocation] =
+    useState<LocationAutocompleteSuggestion | null>(null);
+  const [memberCounts, setMemberCounts] = useState<
+    Array<LocationMemberCount & { key: 'continent' | 'country' | 'region' | 'city' }>
+  >([]);
+  const [subscribeSwitches, setSubscribeSwitches] = useState<Record<string, boolean>>({});
   const [maxLabelWidth, setMaxLabelWidth] = useState(0);
   const labelWidthsRef = useRef<Record<string, number>>({});
   const inputContainerRef = useRef<View>(null);
@@ -75,7 +76,8 @@ export const LocationPersonalizationScreen: React.FC = () => {
   });
 
   // Check if any toggle is on but location is empty
-  const hasToggleOn = shareLocationOnProfile || memberMap || subscribe;
+  const hasToggleOn =
+    shareLocationOnProfile || memberMap || (subscribe && selectedLocation !== null);
   const locationValue = watch('location') || '';
 
   // Location autocomplete hook using TanStack Query
@@ -91,39 +93,80 @@ export const LocationPersonalizationScreen: React.FC = () => {
       // Set location value
       setValue('location', userLocation.formattedAddress || '', { shouldValidate: true });
       previousLocationValueRef.current = userLocation.formattedAddress || '';
+      setSubscribe(userLocation.subscribeToMemberMap ?? true);
       
-      // Create a LocationCity-like object from userLocation
-      if (userLocation.cityId && userLocation.formattedAddress) {
-        const locationCity: LocationCity = {
-          id: userLocation.cityId,
-          name: userLocation.formattedAddress.split(',')[0] || userLocation.formattedAddress,
-          countryId: userLocation.countryId || '',
-          countryName: '',
-          countryCode: '',
-          continentId: userLocation.continentId || '',
-          continentName: '',
-          continentCode: '',
-          regionId: userLocation.regionId || '',
-          regionName: '',
-          regionCode: null,
-          formattedAddress: userLocation.formattedAddress,
+      // Build suggestion from existing user location
+      if (userLocation.formattedAddress) {
+        const locationMatch: LocationMatch = {
+          continent: userLocation.continentId
+            ? {
+                id: userLocation.continentId,
+                name: '',
+              }
+            : undefined,
+          country: userLocation.countryId
+            ? {
+                id: userLocation.countryId,
+                name: '',
+              }
+            : undefined,
+          region: userLocation.regionId
+            ? {
+                id: userLocation.regionId,
+                name: '',
+              }
+            : undefined,
+          city: userLocation.cityId
+            ? {
+                id: userLocation.cityId,
+                name: '',
+              }
+            : undefined,
         };
-        setSelectedLocation(locationCity);
-        
-        // Fetch member counts for existing location
-        memberCountsMutation.mutateAsync({
-          cityId: userLocation.cityId,
-          countryId: userLocation.countryId || '',
-          regionId: userLocation.regionId || '',
-          continentId: userLocation.continentId || '',
-        }).then((response) => {
-          if (response.success && response.data) {
-            const { counts } = convertMemberCountsToArray(response.data);
-            setMemberCounts(counts);
-          }
-        }).catch((error) => {
-          console.error('Failed to fetch member counts:', error);
-        });
+
+        const savedSuggestion: LocationAutocompleteSuggestion = {
+          description: userLocation.formattedAddress,
+          placeId:
+            userLocation.cityId ||
+            userLocation.regionId ||
+            userLocation.countryId ||
+            userLocation.continentId ||
+            'existing-location',
+          formattedAddress: userLocation.formattedAddress || undefined,
+          locationMatch,
+        };
+
+        setSelectedLocation(savedSuggestion);
+
+        memberCountsMutation
+          .mutateAsync({
+            cityId: userLocation.cityId || undefined,
+            countryId: userLocation.countryId || undefined,
+            regionId: userLocation.regionId || undefined,
+            continentId: userLocation.continentId || undefined,
+          })
+          .then(response => {
+            if (response.success && response.data) {
+              const initialSwitchValues: Partial<
+                Record<'continent' | 'country' | 'region' | 'city', boolean>
+              > = {
+                continent: userLocation.subscribeToContinentGroup ?? true,
+                country: userLocation.subscribeToCountryGroup ?? true,
+                region: userLocation.subscribeToRegionGroup ?? true,
+                city: userLocation.subscribeToCityGroup ?? true,
+              };
+              const { counts, switches } = convertMemberCountsToArray(
+                response.data,
+                locationMatch,
+                initialSwitchValues,
+              );
+              setMemberCounts(counts);
+              setSubscribeSwitches(switches);
+            }
+          })
+          .catch(error => {
+            console.error('Failed to fetch member counts:', error);
+          });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -188,18 +231,22 @@ export const LocationPersonalizationScreen: React.FC = () => {
 
     try {
       // Prepare request data
+      const match = selectedLocation.locationMatch;
       const requestData = {
-        continentId: selectedLocation.continentId,
-        countryId: selectedLocation.countryId,
-        regionId: selectedLocation.regionId,
-        cityId: selectedLocation.id,
+        continentId: match?.continent?.id ?? undefined,
+        countryId: match?.country?.id ?? undefined,
+        regionId: match?.region?.id ?? undefined,
+        cityId: match?.city?.id ?? undefined,
         showOnProfile: shareLocationOnProfile,
         subscribeToMemberMap: subscribe,
         subscribeToContinentGroup: subscribeSwitches.continent || false,
         subscribeToCountryGroup: subscribeSwitches.country || false,
         subscribeToRegionGroup: subscribeSwitches.region || false,
         subscribeToCityGroup: subscribeSwitches.city || false,
-        formattedAddress: selectedLocation.formattedAddress,
+        formattedAddress:
+          selectedLocation.formattedAddress ??
+          selectedLocation.description ??
+          data.location.trim(),
       };
 
       const locationResponse = await updateLocationMutation.mutateAsync(requestData);
@@ -224,7 +271,7 @@ export const LocationPersonalizationScreen: React.FC = () => {
             // Navigate to next screen (ProfilePersonalization)
             // Get user profile from response
             const userProfile = userUpdateResponse.data.user?.profile;
-            (navigation as any).navigate('ProfilePersonalization', { 
+            navigation.navigate('ProfilePersonalization', { 
               email, 
               profileCompletionPercentage: updatedPercentage || 50,
               userProfile,
@@ -245,23 +292,41 @@ export const LocationPersonalizationScreen: React.FC = () => {
     }
   };
 
-  const handleToggleChange = (toggleName: 'shareLocation' | 'memberMap' | 'subscribe') => {
-    const currentValue = 
-      toggleName === 'shareLocation' ? shareLocationOnProfile :
-      toggleName === 'memberMap' ? memberMap :
-      subscribe;
+  const handleToggleChange = (
+    toggleName: 'shareLocation' | 'memberMap' | 'subscribe',
+  ) => {
+    const currentValue =
+      toggleName === 'shareLocation'
+        ? shareLocationOnProfile
+        : toggleName === 'memberMap'
+        ? memberMap
+        : subscribe;
+    const newValue = !currentValue;
 
     // Update toggle state
     if (toggleName === 'shareLocation') {
-      setShareLocationOnProfile(!currentValue);
+      setShareLocationOnProfile(newValue);
     } else if (toggleName === 'memberMap') {
-      setMemberMap(!currentValue);
+      setMemberMap(newValue);
     } else {
-      setSubscribe(!currentValue);
+      setSubscribe(newValue);
+      setSubscribeSwitches(prev => {
+        if (memberCounts.length === 0) {
+          return newValue ? prev : {};
+        }
+
+        const updated: Record<string, boolean> = {};
+        memberCounts.forEach(({ key }) => {
+          if (key) {
+            updated[key] = newValue;
+          }
+        });
+
+        return updated;
+      });
     }
 
     // If enabling toggle without location, set error
-    const newValue = !currentValue;
     if (newValue && !locationValue.trim()) {
       setError('location', {
         type: 'manual',
@@ -276,60 +341,98 @@ export const LocationPersonalizationScreen: React.FC = () => {
     handleSubmit(onSubmit)();
   };
 
-  // Helper function to convert member counts response to array
   const convertMemberCountsToArray = (
-    data: LocationMemberCountsResponse
-  ): { counts: (LocationMemberCount & { key: string })[], switches: Record<string, boolean> } => {
-    const counts: (LocationMemberCount & { key: string })[] = [];
+    data: LocationMemberCountsResponse | null | undefined,
+    match?: LocationMatch,
+    initialSwitchValues?: Partial<
+      Record<'continent' | 'country' | 'region' | 'city', boolean>
+    >,
+  ): {
+    counts: Array<
+      LocationMemberCount & { key: 'continent' | 'country' | 'region' | 'city' }
+    >;
+    switches: Record<string, boolean>;
+  } => {
+    const counts: Array<
+      LocationMemberCount & { key: 'continent' | 'country' | 'region' | 'city' }
+    > = [];
     const switches: Record<string, boolean> = {};
 
-    // Define order and mapping
-    const order: Array<'continent' | 'country' | 'region' | 'city'> = ['continent', 'country', 'region', 'city'];
+    const order: Array<'continent' | 'country' | 'region' | 'city'> = [
+      'continent',
+      'country',
+      'region',
+      'city',
+    ];
 
-    order.forEach((key) => {
-      const count = data[key];
-      if (count) {
-        counts.push({ ...count, key });
-        switches[key] = false;
+    order.forEach(key => {
+      const matchEntity = match?.[key];
+      const countEntity = data?.[key];
+
+      if (!matchEntity && !countEntity) {
+        return;
       }
+
+      counts.push({
+        key,
+        id: matchEntity?.id ?? countEntity?.id ?? `${key}-unknown`,
+        name:
+          matchEntity?.name ??
+          countEntity?.name ??
+          matchEntity?.code ??
+          countEntity?.code ??
+          key,
+        code: matchEntity?.code ?? countEntity?.code ?? null,
+        memberCount: countEntity?.memberCount ?? 0,
+      });
+
+      switches[key] = initialSwitchValues?.[key] ?? true;
     });
 
     return { counts, switches };
   };
 
-  const handleSelectLocation = async (city: LocationCity) => {
-    setSelectedLocation(city);
+  const handleSelectLocation = async (
+    suggestion: LocationAutocompleteSuggestion,
+  ) => {
+    setSelectedLocation(suggestion);
+    const formatted =
+      suggestion.formattedAddress ?? suggestion.description ?? '';
     // Update previousLocationValueRef to prevent useEffect from triggering
-    previousLocationValueRef.current = city.formattedAddress;
-    setValue('location', city.formattedAddress, { shouldValidate: true });
+    previousLocationValueRef.current = formatted;
+    setValue('location', formatted, { shouldValidate: true });
     setShowSuggestions(false);
     clearErrors('location');
 
     // Fetch member counts for selected location
     try {
       const response = await memberCountsMutation.mutateAsync({
-        cityId: city.id,
-        countryId: city.countryId,
-        regionId: city.regionId,
-        continentId: city.continentId,
+        cityId: suggestion.locationMatch?.city?.id ?? undefined,
+        countryId: suggestion.locationMatch?.country?.id ?? undefined,
+        regionId: suggestion.locationMatch?.region?.id ?? undefined,
+        continentId: suggestion.locationMatch?.continent?.id ?? undefined,
       });
 
-      if (response.success && response.data) {
-        const { counts, switches } = convertMemberCountsToArray(response.data);
-        
-        console.log('[LocationPersonalization] Member counts:', counts);
-        console.log('[LocationPersonalization] Switches:', switches);
-        
-        // Reset label widths when member counts change
-        labelWidthsRef.current = {};
-        setMaxLabelWidth(0);
-        setMemberCounts(counts);
-        setSubscribeSwitches(switches);
-      } else {
-        console.log('[LocationPersonalization] Response not successful or no data:', response);
-      }
+      const { counts, switches } = convertMemberCountsToArray(
+        response.success ? response.data : null,
+        suggestion.locationMatch,
+      );
+
+      // Reset label widths when member counts change
+      labelWidthsRef.current = {};
+      setMaxLabelWidth(0);
+      setMemberCounts(counts);
+      setSubscribeSwitches(switches);
     } catch (error) {
       console.error('Failed to fetch member counts:', error);
+      const { counts, switches } = convertMemberCountsToArray(
+        null,
+        suggestion.locationMatch,
+      );
+      labelWidthsRef.current = {};
+      setMaxLabelWidth(0);
+      setMemberCounts(counts);
+      setSubscribeSwitches(switches);
     }
   };
 
@@ -346,15 +449,15 @@ export const LocationPersonalizationScreen: React.FC = () => {
     }, 200);
   };
 
-  const renderSuggestionItem = (item: LocationCity) => (
+  const renderSuggestionItem = (item: LocationAutocompleteSuggestion) => (
     <TouchableOpacity
-      key={item.id}
+      key={item.placeId}
       style={styles.suggestionItem}
       onPress={() => handleSelectLocation(item)}
       activeOpacity={0.7}
     >
       <Text variant="body16Regular" style={styles.suggestionText}>
-        {item.formattedAddress}
+        {item.description}
       </Text>
     </TouchableOpacity>
   );
@@ -375,18 +478,18 @@ export const LocationPersonalizationScreen: React.FC = () => {
           </View>
 
           {/* Title */}
-          <Text variant="heading28Bold" style={styles.title}>
+          <Text variant="heading20Bold" style={styles.title}>
             Bring Your Profile to Life!
           </Text>
 
           {/* Question */}
-          <Text variant="body16Regular" style={styles.question}>
+          <Text variant="body16Bold" style={styles.question}>
             Where are you from?
           </Text>
 
           {/* Location Input */}
           <View style={styles.inputContainer} ref={inputContainerRef}>
-            <Text variant="caption12Regular" color="textSecondary" style={styles.inputLabel}>
+            <Text style={styles.inputLabel}>
               Share your Continent, Country, Region, State, or City
             </Text>
             <View style={styles.inputWrapper}>
@@ -421,7 +524,7 @@ export const LocationPersonalizationScreen: React.FC = () => {
           <View style={styles.togglesContainer}>
             {/* Share Location on Profile */}
             <View style={styles.toggleRow}>
-              <Text variant="body16Regular" style={styles.toggleLabel}>
+              <Text variant="paragraph14Bold" style={styles.toggleLabel}>
                 Share Location on Profile
               </Text>
               <Switch
@@ -429,7 +532,6 @@ export const LocationPersonalizationScreen: React.FC = () => {
                 onValueChange={() => handleToggleChange('shareLocation')}
                 trackColor={{ false: '#767577', true: '#46C2A3' }}
                 thumbColor={shareLocationOnProfile ? '#fff' : '#f4f3f4'}
-                ios_backgroundColor="#767577"
                 style={styles.switch}
               />
             </View>
@@ -450,8 +552,9 @@ export const LocationPersonalizationScreen: React.FC = () => {
             </View>
 
             {/* Subscribe */}
+            {memberCounts.length > 0 && (
             <View style={styles.toggleRow}>
-              <Text variant="body16Regular" style={styles.toggleLabel}>
+              <Text variant="paragraph14Bold" style={styles.toggleLabel}>
                 Subscribe
               </Text>
               <Switch
@@ -459,10 +562,10 @@ export const LocationPersonalizationScreen: React.FC = () => {
                 onValueChange={() => handleToggleChange('subscribe')}
                 trackColor={{ false: '#767577', true: '#46C2A3' }}
                 thumbColor={subscribe ? '#fff' : '#f4f3f4'}
-                ios_backgroundColor="#767577"
                 style={styles.switch}
               />
             </View>
+            )}
 
             {/* Dynamic Subscribe Switches */}
             {memberCounts.length > 0 && (
@@ -475,14 +578,16 @@ export const LocationPersonalizationScreen: React.FC = () => {
                     key === 'region' ? 'State/Region' :
                     'City';
                   
-                  const displayName = count.name;
+                  const displayName =
+                    (count.name && count.name.length > 0 ? count.name : undefined) ??
+                    label;
                   const memberCount = count.memberCount;
                   const isEnabled = subscribeSwitches[key] || false;
 
                   return (
                     <View key={key} style={styles.subscribeSwitchRow}>
                       <Text
-                        variant="body16Regular"
+                        variant="paragraph14Bold"
                         style={[styles.subscribeSwitchLabel, maxLabelWidth > 0 && { width: maxLabelWidth }]}
                         onLayout={(event) => {
                           const { width } = event.nativeEvent.layout;
@@ -507,10 +612,9 @@ export const LocationPersonalizationScreen: React.FC = () => {
                         }}
                         trackColor={{ false: '#767577', true: '#46C2A3' }}
                         thumbColor={isEnabled ? '#fff' : '#f4f3f4'}
-                        ios_backgroundColor="#767577"
                         style={styles.locDetailsSwitch}
                       />
-                      <Text variant="body16Regular" style={styles.subscribeSwitchName} numberOfLines={1} ellipsizeMode="tail">
+                      <Text variant="caption12Regular" style={styles.subscribeSwitchName} numberOfLines={1} ellipsizeMode="tail">
                         {displayName} ({memberCount.toLocaleString()} Members)
                       </Text>
                     </View>
@@ -553,34 +657,30 @@ const styles = StyleSheet.create({
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: moderateScale(spacing.xxl),
+    marginTop: moderateScale(spacing.xl),
     marginBottom: moderateScale(22),
   },
   title: {
     textAlign: 'center',
-    marginBottom: moderateScale(spacing.md),
+    marginBottom: moderateScale(22),
     color: '#D6E7E3',
-    fontSize: moderateScale(20),
-    fontStyle: 'normal',
-    fontWeight: '700',
-    lineHeight: undefined,
+    height: moderateScale(lineHeight.xxxxl),
   },
   question: {
     textAlign: 'center',
     marginBottom: moderateScale(22),
     color: '#D6E7E3',
-    fontSize: moderateScale(16),
-    fontStyle: 'normal',
-    fontWeight: '700',
-    lineHeight: undefined,
   },
   inputContainer: {
-    marginBottom: moderateScale(25),
+    marginBottom: moderateScale(22),
     width: '100%',
     position: 'relative',
     zIndex: 1,
   },
   inputLabel: {
+    color: colors.textWhiteWA,
+    fontSize: moderateScale(fontSize.xs),
+    fontWeight: '700',
     marginBottom: moderateScale(spacing.xs),
   },
   inputWrapper: {
@@ -634,7 +734,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   subscribeSwitchesContainer: {
-    marginTop: moderateScale(spacing.md),
+    marginTop: moderateScale(22),
     width: '100%',
     gap: moderateScale(spacing.sm),
   },
@@ -645,19 +745,11 @@ const styles = StyleSheet.create({
   },
   subscribeSwitchLabel: {
     color: '#D6E7E3',
-    fontSize: moderateScale(14),
-    fontStyle: 'normal',
-    fontWeight: '700',
-    lineHeight: moderateScale(16.979),
     textAlign: 'right',
     flexShrink: 0,
   },
   subscribeSwitchName: {
-    color: '#D6E7E3',
-    fontSize: moderateScale(14),
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: moderateScale(16.979),
+    color: 'rgba(255, 255, 255, 0.50)',
     flexShrink: 1,
   },
   toggleRow: {
@@ -669,17 +761,13 @@ const styles = StyleSheet.create({
   toggleLabel: {
     flex: 1,
     color: '#D6E7E3',
-    fontSize: moderateScale(14),
-    fontStyle: 'normal',
-    fontWeight: '700',
-    lineHeight: moderateScale(16.979),
   },
   switch: {
-    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
   },
   locDetailsSwitch: {
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
-    marginHorizontal: moderateScale(spacing.md),
+    marginLeft: moderateScale(22),
+    marginRight: moderateScale(12),
   },
   memberMapRow: {
     alignItems: 'center',
@@ -728,11 +816,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: moderateScale(spacing.md),
     marginBottom: moderateScale(spacing.xxl),
-    color: '#F1F1F1',
-    fontSize: moderateScale(12),
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: undefined,
+    color: '#C7DBD6',
   },
 });
 

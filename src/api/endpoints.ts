@@ -37,7 +37,7 @@ export const API_ENDPOINTS = {
 
   // Locations
   LOCATIONS: {
-    AUTOCOMPLETE: '/locations/autocomplete',
+    AUTOCOMPLETE: '/locations/google/autocomplete',
     MEMBER_COUNTS: '/locations/member-counts',
     UPDATE_USER_LOCATION: '/locations/update-user-location',
   },

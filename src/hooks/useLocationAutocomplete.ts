@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocationAutocompleteQuery } from '@/api/query/queries/useLocationQueries';
 import { useDebouncedValue } from './useDebouncedValue';
-import type { LocationCity } from '@/api/types';
+import type { LocationAutocompleteSuggestion } from '@/api/types';
 
 interface UseLocationAutocompleteOptions {
   debounceMs?: number;
@@ -10,7 +10,7 @@ interface UseLocationAutocompleteOptions {
 }
 
 interface UseLocationAutocompleteResult {
-  suggestions: LocationCity[];
+  suggestions: LocationAutocompleteSuggestion[];
   isLoading: boolean;
   error: string | null;
   search: (query: string) => void;
@@ -52,9 +52,8 @@ export const useLocationAutocomplete = (
   };
 
   // Extract suggestions from response
-  const suggestions = response?.success && response.data?.cities
-    ? response.data.cities
-    : [];
+  const suggestions =
+    response?.success && Array.isArray(response.data) ? response.data : [];
 
   // Extract error message
   const error = queryError

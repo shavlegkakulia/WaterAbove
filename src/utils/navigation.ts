@@ -66,43 +66,43 @@ export function getInitialNavigationRoute(
     return { name: 'LocationPersonalization', params: { email } };
   }
 
-  // Step 5: Profile personalization (after location is set)
-  // Check if profile needs completion (zodiacSign, gender, purpose, etc.)
-  // Profile is considered complete if it has at least zodiacSign OR gender OR purpose
-  const hasZodiacSign = !!apiUser.profile?.zodiacSign;
-  const hasGender = !!apiUser.profile?.gender;
-  const hasPurpose = !!(
-    apiUser.profile?.purpose && 
-    Array.isArray(apiUser.profile.purpose) && 
-    apiUser.profile.purpose.length > 0
-  );
-  const hasProfilePersonalization = hasZodiacSign || hasGender || hasPurpose;
-  
-  // If location exists but profile personalization is not complete, go to ProfilePersonalization
-  if (isVerified && hasPassword && hasUsername && hasUserLocation && !hasProfilePersonalization) {
+  const profileCompletionPercentage =
+    apiUser.profile?.profileCompletionPercentage ?? 0;
+  const isProfileComplete =
+    hasUserLocation && profileCompletionPercentage >= 100;
+
+  if (!isProfileComplete) {
     if (!email) {
       return { name: 'Login' };
     }
-    return { name: 'ProfilePersonalization', params: { 
-      email,
-      profileCompletionPercentage: apiUser.profile?.profileCompletionPercentage || undefined,
-      userProfile: apiUser.profile || undefined,
-    } };
-  }
-  
-  // If both location and profile personalization exist, allow editing on ProfilePersonalization
-  if (isVerified && hasPassword && hasUsername && hasUserLocation && hasProfilePersonalization) {
-    if (!email) {
-      return { name: 'Login' };
-    }
-    // Allow editing profile personalization even if it exists
-    return { name: 'ProfilePersonalization', params: { 
-      email,
-      profileCompletionPercentage: apiUser.profile?.profileCompletionPercentage || undefined,
-      userProfile: apiUser.profile || undefined,
-    } };
+    return {
+      name: 'LocationPersonalization',
+      params: {
+        email,
+        userLocation: apiUser.userLocation ?? undefined,
+        profileCompletionPercentage:
+          apiUser.profile?.profileCompletionPercentage ?? undefined,
+      },
+    };
   }
 
-  // Fallback to Login
-  return { name: 'Login' };
+  if (!email) {
+    return { name: 'Login' };
+  }
+
+  if (apiUser.profile?.profileCompletionPercentage === 100) {
+    return {
+      name: 'Login',
+    };
+  }
+
+  return {
+    name: 'LifestylePersonalization',
+    params: {
+      email,
+      profileCompletionPercentage:
+        apiUser.profile?.profileCompletionPercentage ?? undefined,
+      userProfile: apiUser.profile ?? undefined,
+    },
+  };
 }

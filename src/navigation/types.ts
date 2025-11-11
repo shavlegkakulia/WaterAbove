@@ -10,6 +10,10 @@ export type RootStackParamList = {
   Personalization: { email: string };
   LocationPersonalization: { email: string; userLocation?: ApiUser['userLocation']; profileCompletionPercentage?: number };
   ProfilePersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  TopicsPersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  CareerPersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  LifestylePersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  ProfileCompleted: { email: string };
   Welcome: { avatarUrl?: string; avatarBase64?: string; email?: string };
   ForgotPassword: undefined;
   CheckInbox: { email: string };

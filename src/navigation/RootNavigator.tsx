@@ -11,6 +11,10 @@ import {
   PersonalizationScreen,
   LocationPersonalizationScreen,
   ProfilePersonalizationScreen,
+  TopicsPersonalizationScreen,
+  CareerPersonalizationScreen,
+  LifestylePersonalizationScreen,
+  ProfileCompletedScreen,
   WelcomeScreen,
   ForgotPasswordScreen,
   CheckInboxScreen,
@@ -42,6 +46,10 @@ export const RootNavigator: React.FC = () => {
         <Stack.Screen name="Personalization" component={PersonalizationScreen} />
         <Stack.Screen name="LocationPersonalization" component={LocationPersonalizationScreen} />
         <Stack.Screen name="ProfilePersonalization" component={ProfilePersonalizationScreen} />
+        <Stack.Screen name="TopicsPersonalization" component={TopicsPersonalizationScreen} />
+        <Stack.Screen name="CareerPersonalization" component={CareerPersonalizationScreen} />
+        <Stack.Screen name="LifestylePersonalization" component={LifestylePersonalizationScreen} />
+        <Stack.Screen name="ProfileCompleted" component={ProfileCompletedScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="CheckInbox" component={CheckInboxScreen} />

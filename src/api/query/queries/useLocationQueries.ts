@@ -22,8 +22,8 @@ export const useLocationAutocompleteQuery = (
     queryKey: queryKeys.locations.autocomplete(query, limit),
     queryFn: async () => {
       const request: LocationAutocompleteRequest = {
+        input: query.trim(),
         limit,
-        q: query.trim(),
       };
       return locationService.autocomplete(request);
     },

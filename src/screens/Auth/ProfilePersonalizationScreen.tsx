@@ -1,24 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Switch } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import type { RouteProp } from '@react-navigation/native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FormCard, Button, Text, AuthScreenWrapper, CircularProgressBar } from '@/components';
-import { spacing } from '@/theme';
+import {
+  FormCard,
+  Button,
+  Text,
+  AuthScreenWrapper,
+  CircularProgressBar,
+  Switch,
+} from '@/components';
+import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
-import type { RootStackParamList } from '@/navigation/types';
 import { Icon } from '@/components/Icon';
 import { useUpdateUserMutation, useUserQuery } from '@/api/query';
 import { useToast } from '@/store/hooks';
 import type { UserPurpose, UserGender, UserZodiacSign } from '@/api/types';
+import { useAppNavigation, useAppRoute } from '@/navigation';
 
 // Validation schema
 const profilePersonalizationSchema = z.object({
   zodiacSign: z.string().optional(),
   gender: z.string().optional(),
-  purpose: z.array(z.string()).min(1, 'Please select at least one purpose').max(3, 'Please select up to 3 purposes'),
+  purpose: z
+    .array(z.string())
+    .min(1, 'Please select at least one purpose')
+    .max(3, 'Please select up to 3 purposes'),
   showAge: z.boolean().optional(),
   showDob: z.boolean().optional(),
 });
@@ -26,7 +34,11 @@ const profilePersonalizationSchema = z.object({
 type ProfilePersonalizationFormData = z.infer<typeof profilePersonalizationSchema>;
 
 // Zodiac Sign Options
-const ZODIAC_SIGNS: Array<{ value: UserZodiacSign; label: string; symbol: string }> = [
+const ZODIAC_SIGNS: Array<{
+  value: UserZodiacSign;
+  label: string;
+  symbol: string;
+}> = [
   { value: 'aries', label: 'Aries', symbol: '♈' },
   { value: 'taurus', label: 'Taurus', symbol: '♉' },
   { value: 'gemini', label: 'Gemini', symbol: '♊' },
@@ -51,7 +63,11 @@ const GENDER_OPTIONS: Array<{ value: UserGender; label: string }> = [
 ];
 
 // Purpose Options
-const PURPOSE_OPTIONS: Array<{ value: UserPurpose; label: string; emoji: string }> = [
+const PURPOSE_OPTIONS: Array<{
+  value: UserPurpose;
+  label: string;
+  emoji: string;
+}> = [
   { value: 'starting-a-business', label: 'Starting a Business', emoji: '🚀' },
   { value: 'networking', label: 'Networking', emoji: '💼' },
   { value: 'looking-for-work', label: 'Looking for work', emoji: '👤' },
@@ -60,27 +76,107 @@ const PURPOSE_OPTIONS: Array<{ value: UserPurpose; label: string; emoji: string 
   { value: 'dating', label: 'Dating', emoji: '💕' },
 ];
 
+const MINIMUM_AGE_FOR_DATING = 18;
+
+const parseDateOfBirth = (dateOfBirth?: string | null): Date | null => {
+  if (!dateOfBirth) {
+    return null;
+  }
+
+  const directDate = new Date(dateOfBirth);
+  if (!Number.isNaN(directDate.getTime())) {
+    return directDate;
+  }
+
+  const normalizedDob = dateOfBirth.replace(/\./g, '-').replace(/\//g, '-');
+  const parts = normalizedDob.split('-').map(part => part.trim());
+
+  if (parts.length === 3) {
+    const [first, second, third] = parts;
+
+    const isDayFirst = Number(first) <= 31 && Number(second) <= 12;
+    const day = Number(isDayFirst ? first : second);
+    const month = Number(isDayFirst ? second : first);
+    const year = Number(third.length === 4 ? third : third.padStart(4, '20'));
+
+    if (
+      Number.isFinite(day) &&
+      Number.isFinite(month) &&
+      Number.isFinite(year)
+    ) {
+      const candidate = new Date(year, month - 1, day);
+      if (!Number.isNaN(candidate.getTime())) {
+        return candidate;
+      }
+    }
+  }
+
+  return null;
+};
+
+const calculateAge = (date: Date): number => {
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDiff = today.getMonth() - date.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < date.getDate())
+  ) {
+    age -= 1;
+  }
+
+  return age;
+};
+
+const formatDateForDisplay = (date: Date): string => {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const month = months[date.getMonth()];
+  const day = date.getDate();
+
+  return `${month} ${day}`;
+};
+
 export const ProfilePersonalizationScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const route = useRoute<RouteProp<RootStackParamList, 'ProfilePersonalization'>>();
+  const navigation = useAppNavigation<'ProfilePersonalization'>();
+  const route = useAppRoute<'ProfilePersonalization'>();
+  const emailParam = route.params?.email;
   const initialPercentage = route.params?.profileCompletionPercentage || 50;
   const userProfileFromRoute = route.params?.userProfile;
   const { showSuccess } = useToast();
   const updateUserMutation = useUpdateUserMutation();
   const { data: userData } = useUserQuery();
-  
+
   // Check if navigation can go back
   const canGoBack = navigation.canGoBack();
 
   // Get user profile from route params or from API response
-  const userProfile = userProfileFromRoute || (userData as any)?.data?.user?.profile || (userData as any)?.user?.profile;
+  const userProfile =
+    userProfileFromRoute || userData?.data?.user?.profile || null;
 
   const [zodiacSign, setZodiacSign] = useState<UserZodiacSign | null>(null);
   const [gender, setGender] = useState<UserGender | null>(null);
   const [purpose, setPurpose] = useState<UserPurpose[]>([]);
   const [showAge, setShowAge] = useState(false);
   const [showDob, setShowDob] = useState(false);
-  const [profileCompletionPercentage, setProfileCompletionPercentage] = useState(initialPercentage);
+  const [profileCompletionPercentage, setProfileCompletionPercentage] =
+    useState(initialPercentage);
+  const [calculatedAge, setCalculatedAge] = useState<number | null>(null);
+  const [formattedDateOfBirth, setFormattedDateOfBirth] = useState<string>('');
 
   const {
     handleSubmit,
@@ -98,9 +194,30 @@ export const ProfilePersonalizationScreen: React.FC = () => {
     },
   });
 
+  const isUnderage = useMemo(() => {
+    if (calculatedAge === null) {
+      return false;
+    }
+    return calculatedAge < MINIMUM_AGE_FOR_DATING;
+  }, [calculatedAge]);
+
   // Load user profile data on mount
   useEffect(() => {
     if (userProfile) {
+      let nextAge: number | null = null;
+
+      if (userProfile.dateOfBirth) {
+        const parsedDob = parseDateOfBirth(userProfile.dateOfBirth);
+        if (parsedDob) {
+          nextAge = calculateAge(parsedDob);
+          setFormattedDateOfBirth(formatDateForDisplay(parsedDob));
+        }
+      }
+
+      setCalculatedAge(nextAge);
+
+      const underage = nextAge !== null && nextAge < MINIMUM_AGE_FOR_DATING;
+
       // Set zodiac sign
       if (userProfile.zodiacSign) {
         const sign = userProfile.zodiacSign as UserZodiacSign;
@@ -111,24 +228,34 @@ export const ProfilePersonalizationScreen: React.FC = () => {
       // Set gender
       if (userProfile.gender) {
         const userGender = userProfile.gender.toLowerCase() as UserGender;
-        setGender(userGender);
-        setValue('gender', userGender, { shouldValidate: true });
+        if (userGender && userGender !== 'unspecified') {
+          setGender(userGender);
+          setValue('gender', userGender, { shouldValidate: true });
+        } else {
+          setGender(null);
+          setValue('gender', undefined, { shouldValidate: true });
+        }
       }
 
       // Set purpose (array)
       if (userProfile.purpose) {
-        const purposeArray = Array.isArray(userProfile.purpose) 
-          ? userProfile.purpose as UserPurpose[]
+        const purposeArray = Array.isArray(userProfile.purpose)
+          ? (userProfile.purpose as UserPurpose[])
           : typeof userProfile.purpose === 'string'
           ? [userProfile.purpose as UserPurpose]
           : [];
-        setPurpose(purposeArray);
-        setValue('purpose', purposeArray, { shouldValidate: true });
+        const sanitizedPurpose = underage
+          ? purposeArray.filter(purposeValue => purposeValue !== 'dating')
+          : purposeArray;
+        setPurpose(sanitizedPurpose);
+        setValue('purpose', sanitizedPurpose, { shouldValidate: true });
       }
 
       // Set show age
       if (userProfile.showAge !== null && userProfile.showAge !== undefined) {
-        setShowAge(userProfile.showAge);
+        setShowAge(!underage && userProfile.showAge);
+      } else {
+        setShowAge(false);
       }
 
       // Set show DOB
@@ -137,12 +264,46 @@ export const ProfilePersonalizationScreen: React.FC = () => {
       }
 
       // Set profile completion percentage
-      if (userProfile.profileCompletionPercentage !== null && userProfile.profileCompletionPercentage !== undefined) {
-        setProfileCompletionPercentage(userProfile.profileCompletionPercentage);
+      if (
+        userProfile.profileCompletionPercentage !== null &&
+        userProfile.profileCompletionPercentage !== undefined
+      ) {
+        setProfileCompletionPercentage(
+          userProfile.profileCompletionPercentage,
+        );
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfile]);
+  }, [userProfile, setValue]);
+
+  useEffect(() => {
+    if (isUnderage && purpose.includes('dating')) {
+      const filteredPurpose = purpose.filter(item => item !== 'dating');
+      setPurpose(filteredPurpose);
+      setValue('purpose', filteredPurpose, { shouldValidate: true });
+      setShowAge(false);
+    }
+  }, [isUnderage, purpose, setValue]);
+
+  const availablePurposeOptions = useMemo(() => {
+    if (!isUnderage) {
+      return PURPOSE_OPTIONS;
+    }
+    return PURPOSE_OPTIONS.filter(option => option.value !== 'dating');
+  }, [isUnderage]);
+
+  const ageLabel = useMemo(() => {
+    if (calculatedAge === null) {
+      return '--';
+    }
+    return calculatedAge.toString();
+  }, [calculatedAge]);
+
+  const birthdayLabel = useMemo(() => {
+    if (!formattedDateOfBirth) {
+      return 'Birthday not set';
+    }
+    return formattedDateOfBirth;
+  }, [formattedDateOfBirth]);
 
   const handleZodiacSignSelect = (sign: UserZodiacSign) => {
     setZodiacSign(sign === zodiacSign ? null : sign);
@@ -155,6 +316,10 @@ export const ProfilePersonalizationScreen: React.FC = () => {
   };
 
   const handlePurposeSelect = (selectedPurpose: UserPurpose) => {
+    if (isUnderage && selectedPurpose === 'dating') {
+      return;
+    }
+
     if (purpose.includes(selectedPurpose)) {
       const newPurpose = purpose.filter(p => p !== selectedPurpose);
       setPurpose(newPurpose);
@@ -176,7 +341,7 @@ export const ProfilePersonalizationScreen: React.FC = () => {
           profileCompletionPercentage: 70,
           zodiacSign: zodiacSign || undefined,
           gender: gender || undefined,
-          showAge: showAge,
+          showAge: isUnderage ? false : showAge,
           showDob: showDob,
           purpose: purpose.length > 0 ? purpose : undefined,
         },
@@ -184,12 +349,20 @@ export const ProfilePersonalizationScreen: React.FC = () => {
 
       if (response.success && response.data) {
         const updatedPercentage = response.data.user?.profile?.profileCompletionPercentage;
+        const updatedProfile = response.data.user?.profile;
         if (updatedPercentage !== undefined && updatedPercentage !== null) {
           setProfileCompletionPercentage(updatedPercentage);
         }
         showSuccess('Profile updated successfully!');
-        // Navigate to next screen
-        // navigation.navigate('Welcome', { email });
+        const resolvedEmail =
+          emailParam || userData?.data?.user?.email || null;
+
+        navigation.navigate('TopicsPersonalization', {
+          email: resolvedEmail ?? '',
+          profileCompletionPercentage:
+            updatedPercentage ?? profileCompletionPercentage,
+          userProfile: updatedProfile,
+        });
       }
     } catch (error) {
       console.error('Failed to update profile:', error);
@@ -233,54 +406,65 @@ export const ProfilePersonalizationScreen: React.FC = () => {
         </View>
 
         {/* Title */}
-        <Text variant="heading28Bold" style={styles.title}>
+        <Text variant="heading20Bold" style={styles.title}>
           Bring Your Profile to Life!
         </Text>
 
         {/* Birthday & Age Preferences */}
-        <View style={styles.sectionContainer}>
-          <Text variant="body16Bold" style={styles.sectionTitle}>
-            Birthday & age preferences
-          </Text>
-          
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleLabelContainer}>
-              <Text variant="body16Regular" style={styles.toggleLabel}>
-                Age: 32
-              </Text>
-              <Text variant="body16Regular" style={styles.toggleSubLabel}>
-                Show my age on profile
-              </Text>
-            </View>
-            <Switch
-              value={showAge}
-              onValueChange={setShowAge}
-              trackColor={{ false: '#767577', true: '#46C2A3' }}
-              thumbColor={showAge ? '#fff' : '#f4f3f4'}
-              ios_backgroundColor="#767577"
-              style={styles.switch}
-            />
-          </View>
+        {!isUnderage ? (
+          <View style={styles.sectionContainer}>
+            <Text variant="body16Bold" style={styles.sectionTitle}>
+              Birthday & age preferences
+            </Text>
 
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleLabelContainer}>
-              <Text variant="body16Regular" style={styles.toggleLabel}>
-                September 21
-              </Text>
-              <Text variant="body16Regular" style={styles.toggleSubLabel}>
+            <View style={styles.toggleRow}>
+              <Switch
+                value={showAge}
+                onValueChange={setShowAge}
+                trackColor={{ false: '#535764', true: '#46C2A3' }}
+                thumbColor={showAge ? '#FFFFFF' : '#E9EAED'}
+                style={styles.switch}
+              />
+              <Text style={styles.toggleValue} variant="paragraph14Bold">{`Age: ${ageLabel}`}</Text>
+              <Text style={styles.toggleSubLabel} variant="caption12Regular" numberOfLines={1}>
                 Show my age on profile
               </Text>
             </View>
-            <Switch
-              value={showDob}
-              onValueChange={setShowDob}
-              trackColor={{ false: '#767577', true: '#46C2A3' }}
-              thumbColor={showDob ? '#fff' : '#f4f3f4'}
-              ios_backgroundColor="#767577"
-              style={styles.switch}
-            />
+
+            <View style={styles.toggleRow}>
+              <Switch
+                value={showDob}
+                onValueChange={setShowDob}
+                trackColor={{ false: '#535764', true: '#46C2A3' }}
+                thumbColor={showDob ? '#FFFFFF' : '#E9EAED'}
+                style={styles.switch}
+              />
+              <Text style={styles.toggleValue} variant="paragraph14Bold">{birthdayLabel}</Text>
+              <Text style={styles.toggleSubLabel} variant="caption12Regular" numberOfLines={1}>
+                Show my birthday on profile
+              </Text>
+            </View>
           </View>
-        </View>
+        ) : (
+          <View style={styles.sectionContainer}>
+            <Text variant="body16Bold" style={styles.sectionTitle}>
+              Birthday preferences
+            </Text>
+            <View style={styles.toggleRow}>
+              <Switch
+                value={showDob}
+                onValueChange={setShowDob}
+                trackColor={{ false: '#535764', true: '#46C2A3' }}
+                thumbColor={showDob ? '#FFFFFF' : '#E9EAED'}
+                style={styles.switch}
+              />
+              <Text style={styles.toggleValue} variant="paragraph14Bold">{birthdayLabel}</Text>
+              <Text style={styles.toggleSubLabel} variant="caption12Regular" numberOfLines={1}>
+                Show my birthday on profile
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Show Your Zodiac Sign? */}
         <View style={styles.section}>
@@ -302,11 +486,11 @@ export const ProfilePersonalizationScreen: React.FC = () => {
                 onPress={() => handleZodiacSignSelect(sign.value)}
                 activeOpacity={0.7}
               >
-                <Text variant="body16Regular" style={styles.pillButtonSymbol}>
+                <Text variant="paragraph14Regular" style={styles.pillButtonSymbol}>
                   {sign.symbol}
                 </Text>
                 <Text
-                  variant="body16Regular"
+                  variant="paragraph14Regular"
                   style={[
                     styles.pillButtonText,
                     zodiacSign === sign.value && styles.pillButtonTextSelected,
@@ -353,12 +537,14 @@ export const ProfilePersonalizationScreen: React.FC = () => {
           </ScrollView>
         </View>
 
+        <View style={styles.sectionDivider} />
+
         {/* What are you here for? */}
         <View style={styles.section}>
           <Text variant="body16Bold" style={styles.sectionTitle}>
             What are you here for?
           </Text>
-          <Text variant="body16Regular" style={styles.helpText}>
+          <Text variant="caption12Regular" style={styles.helpText}>
             Select between one and three for the best experience
           </Text>
           <ScrollView
@@ -366,17 +552,21 @@ export const ProfilePersonalizationScreen: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
           >
-            {PURPOSE_OPTIONS.map((option) => {
+            {availablePurposeOptions.map(option => {
               const isSelected = purpose.includes(option.value);
+              const isDisabled =
+                isUnderage && option.value === 'dating';
               return (
                 <TouchableOpacity
                   key={option.value}
                   style={[
                     styles.pillButton,
                     isSelected && styles.pillButtonSelected,
+                    isDisabled && styles.pillButtonDisabled,
                   ]}
                   onPress={() => handlePurposeSelect(option.value)}
                   activeOpacity={0.7}
+                  disabled={isDisabled}
                 >
                   <Text variant="body16Regular" style={styles.pillButtonEmoji}>
                     {option.emoji}
@@ -386,6 +576,7 @@ export const ProfilePersonalizationScreen: React.FC = () => {
                     style={[
                       styles.pillButtonText,
                       isSelected && styles.pillButtonTextSelected,
+                      isDisabled && styles.pillButtonTextDisabled,
                     ]}
                   >
                     {option.label}
@@ -432,7 +623,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginTop: moderateScale(spacing.xl),
-    marginBottom: moderateScale(spacing.md),
+    marginBottom: moderateScale(22),
     paddingHorizontal: moderateScale(spacing.xl),
   },
   backButtonContainer: {
@@ -464,10 +655,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: moderateScale(spacing.xl),
     color: '#D6E7E3',
-    fontSize: moderateScale(20),
-    fontStyle: 'normal',
-    fontWeight: '700',
-    lineHeight: undefined,
+    height: moderateScale(lineHeight.xxxxl),
     paddingHorizontal: moderateScale(spacing.xl),
   },
   sectionContainer: {
@@ -475,50 +663,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(spacing.xl),
   },
   section: {
-    marginBottom: moderateScale(spacing.xl),
     width: '100%',
   },
   sectionTitle: {
-    color: '#D6E7E3',
-    fontSize: moderateScale(16),
-    fontStyle: 'normal',
-    fontWeight: '700',
-    lineHeight: undefined,
-    marginBottom: moderateScale(spacing.md),
+    color: colors.white,
+    lineHeight: moderateScale(lineHeight.lg),
+   // marginTop: moderateScale(spacing.md),
+    marginBottom: moderateScale(22),
     paddingHorizontal: moderateScale(spacing.xl),
+    textAlign: 'center',
   },
   toggleRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    marginBottom: moderateScale(spacing.md),
+    marginBottom: moderateScale(22),
+    paddingLeft: moderateScale(spacing.md),
+    columnGap: moderateScale(spacing.sm),
   },
-  toggleLabelContainer: {
-    flex: 1,
-    marginRight: moderateScale(spacing.sm),
-  },
-  toggleLabel: {
-    color: '#D6E7E3',
-    fontSize: moderateScale(16),
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: undefined,
-    marginBottom: moderateScale(2),
+  toggleValue: {
+    color: '#F1F1F1',
+    marginRight: moderateScale(spacing.xs),
   },
   toggleSubLabel: {
-    color: '#D6E7E3',
-    fontSize: moderateScale(14),
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: undefined,
-    opacity: 0.7,
+    flexShrink: 1,
+    textAlign: 'right',
+    color: 'rgba(209,215,233,0.72)',
   },
   switch: {
-    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
   },
   horizontalScroll: {
     paddingHorizontal: moderateScale(spacing.xl),
+    marginBottom: moderateScale(22),
   },
   pillButton: {
     flexDirection: 'row',
@@ -529,23 +705,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#5883EA',
     backgroundColor: 'transparent',
-    marginRight: moderateScale(spacing.sm),
+    marginRight: moderateScale(spacing.md),
     minHeight: moderateScale(40),
   },
   pillButtonSelected: {
     borderColor: '#47ECC3',
     backgroundColor: '#C7DBD6',
   },
+  pillButtonDisabled: {
+    opacity: 0.5,
+  },
   pillButtonText: {
-    color: '#D6E7E3',
-    fontSize: moderateScale(14),
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: undefined,
+    color: colors.white,
   },
   pillButtonTextSelected: {
-    color: '#FFFFFF',
-    fontWeight: '600',
+    color: colors.black,
   },
   pillButtonSymbol: {
     color: '#D6E7E3',
@@ -557,14 +731,14 @@ const styles = StyleSheet.create({
     marginRight: moderateScale(spacing.xs),
   },
   helpText: {
-    color: '#D6E7E3',
-    fontSize: moderateScale(14),
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: undefined,
-    opacity: 0.7,
-    marginBottom: moderateScale(spacing.md),
+    color: colors.white,
+    marginBottom: moderateScale(19),
+    marginTop: -moderateScale(16),
     paddingHorizontal: moderateScale(spacing.xl),
+    textAlign: 'center',
+  },
+  pillButtonTextDisabled: {
+    color: '#9FA9C5',
   },
   errorText: {
     color: '#EF4444',
@@ -573,7 +747,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    marginBottom: moderateScale(spacing.md),
+    marginTop: moderateScale(spacing.sm),
+    marginBottom: moderateScale(22),
     paddingHorizontal: moderateScale(spacing.xl),
   },
   button: {
@@ -583,11 +758,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: moderateScale(spacing.md),
     marginBottom: moderateScale(spacing.xxl),
-    color: '#F1F1F1',
-    fontSize: moderateScale(12),
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: undefined,
+    color: '#C7DBD6',
+  },
+  sectionDivider: {
+    width: '88%',
+    alignSelf: 'center',
+    height: StyleSheet.hairlineWidth,
+    marginBottom: moderateScale(22),
+    backgroundColor: '#DBDBDB',
   },
 });
 
