@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { FlatList } from "react-native";
 import { colors } from "@/theme";
 import RenderListItem from "./RenderListItem";
 import { yearsMap } from "./helpers";
-import { moderateScale } from "@/utils";
+import { isAndroid, moderateScale } from "@/utils";
 
 type TYearsListProps = {
   currentMonth: number;
@@ -23,7 +23,7 @@ export default function YearsList({
   const YearsListRef = useRef<FlatList<number>>(null);
 
   const scrollToYear = useCallback(() => {
-    if (Platform.OS === "android") {
+    if (isAndroid) {
       const index = yearsMap(maxYear).indexOf(currentYear);
       YearsListRef?.current?.scrollToIndex({
         index: index,

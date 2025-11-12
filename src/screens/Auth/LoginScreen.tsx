@@ -9,13 +9,14 @@ import {
   Text,
   FormInput,
   Checkbox,
-  Icon,
   FormCard,
   LinkLabel,
   AuthScreenWrapper,
   Divider,
   PasswordVisibilityToggle,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
+import { EnvelopeIcon, LockIcon } from '@/components/icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,21 +25,10 @@ import { useAuth, useToast } from '@/store/hooks';
 import { loginSchema, type LoginFormData } from '@/validation';
 import { moderateScale } from '@/utils';
 
-const EnvelopeIcon = () => (
-  <View style={styles.iconPlaceholder}>
-    <Icon name="Mail" size={18} color="#ffffff" />
-  </View>
-);
-
-const LockIcon = () => (
-  <View style={styles.iconPlaceholder}>
-    <Icon name="Lock" size={18} color="#ffffff" />
-  </View>
-);
-
 export const LoginScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'Login'>>();
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const prefillEmail = route.params?.email || '';
   const fromAlreadyVerified = route.params?.alreadyVerified === true;
   const { login, isLoading } = useAuth();
@@ -87,7 +77,9 @@ export const LoginScreen: React.FC = () => {
 
         {/* Title */}
         <Text variant="heading28Bold" color="textWhiteWA" style={styles.title}>
-          {fromAlreadyVerified ? 'Email already verified' : 'Login or create an account to get Started!'}
+          {fromAlreadyVerified
+            ? 'Email already verified'
+            : 'Login or create an account to get Started!'}
         </Text>
 
         {/* Email Input */}
@@ -127,7 +119,11 @@ export const LoginScreen: React.FC = () => {
             containerStyle={styles.checkboxContainer}
             labelStyle={styles.checkboxLabel}
           />
-          <LinkLabel onPress={handleForgotPassword} textVariant="caption12Regular" underline>
+          <LinkLabel
+            onPress={handleForgotPassword}
+            textVariant="caption12Regular"
+            underline
+          >
             Forgot password?
           </LinkLabel>
         </View>
@@ -151,7 +147,11 @@ export const LoginScreen: React.FC = () => {
               <Text variant="body16Bold" color="textWhiteWA">
                 New here?{' '}
               </Text>
-              <LinkLabel onPress={handleCreateAccount} textVariant="body16Bold" underline>
+              <LinkLabel
+                onPress={handleCreateAccount}
+                textVariant="body16Bold"
+                underline
+              >
                 Create an account
               </LinkLabel>
             </View>
@@ -165,7 +165,7 @@ export const LoginScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   logo: {
-    marginTop: moderateScale(56),
+    marginTop: moderateScale(56) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(36),
   },
   title: {
@@ -198,16 +198,8 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginTop: moderateScale(25),
   },
-  iconPlaceholder: {
-    width: moderateScale(24),
-    height: moderateScale(24),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dividerContainer: {
-    
-  },
+  dividerContainer: {},
   emptySpace: {
-    marginBottom: moderateScale(56),
+    marginBottom: moderateScale(56) - SVG_BORDER_HEIGHT,
   },
 });

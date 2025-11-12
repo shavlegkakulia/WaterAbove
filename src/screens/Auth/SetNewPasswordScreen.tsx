@@ -10,9 +10,9 @@ import {
   FormCard,
   LinkLabel,
   AuthScreenWrapper,
-  Icon,
   PasswordVisibilityToggle,
   Input,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -23,18 +23,7 @@ import { passwordSetupSchema, type PasswordSetupFormData } from '@/validation';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '@/api';
 import { moderateScale } from '@/utils';
-
-const EnvelopeIcon = () => (
-  <View style={styles.iconPlaceholder}>
-    <Icon name="Mail" size={18} color="#ffffff" />
-  </View>
-);
-
-const LockIcon = () => (
-  <View style={styles.iconPlaceholder}>
-    <Icon name="Lock" size={18} color="#ffffff" />
-  </View>
-);
+import { EnvelopeIcon, LockIcon } from '@/components/icons';
 
 export const SetNewPasswordScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -160,7 +149,7 @@ export const SetNewPasswordScreen: React.FC = () => {
 const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
-    marginTop: moderateScale(spacing.xxl),
+    marginTop: moderateScale(spacing.xxl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(spacing.md),
   },
   subtitle: {
@@ -177,14 +166,8 @@ const styles = StyleSheet.create({
   },
   backLink: {
     marginTop: moderateScale(spacing.md),
-    marginBottom: moderateScale(spacing.bordered),
+    marginBottom: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT,
     alignSelf: 'center',
-  },
-  iconPlaceholder: {
-    width: moderateScale(24),
-    height: moderateScale(24),
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 

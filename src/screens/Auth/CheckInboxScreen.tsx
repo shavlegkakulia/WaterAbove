@@ -7,6 +7,7 @@ import {
   FormCard,
   LinkLabel,
   AuthScreenWrapper,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -65,7 +66,7 @@ export const CheckInboxScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   logo: {
-    marginTop: moderateScale(spacing.bordered),
+    marginTop: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(spacing.xxl),
   },
   title: {
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
   backLink: {
     marginTop: moderateScale(spacing.xl),
     alignSelf: 'center',
-    marginBottom: moderateScale(spacing.bordered),
+    marginBottom: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT,
   },
   email: {
     textAlign: 'center',

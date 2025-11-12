@@ -13,6 +13,7 @@ import {
   FormInput,
   Switch,
   OptionPill,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { Icon } from '@/components/ui/Icon';
 import { colors, lineHeight, spacing } from '@/theme';
@@ -466,7 +467,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: moderateScale(spacing.xl),
+    marginTop: moderateScale(spacing.xl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(22),
     paddingHorizontal: moderateScale(spacing.xl),
   },
@@ -498,7 +499,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   scrollContent: {
-    paddingBottom: moderateScale(30),
+    paddingBottom: moderateScale(30) - SVG_BORDER_HEIGHT,
   },
   title: {
     textAlign: 'center',

@@ -1,16 +1,12 @@
 import React, {useEffect} from 'react';
-import {
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  Platform,
-} from 'react-native';
+import {StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useAtomValue, useSetAtom} from 'jotai';
 import {toastsAtom, removeToastAtom} from '@/store/atoms';
 import {colors, spacing, borderRadius, shadows} from '@/theme';
 import {Text} from '@/components/ui/Typography';
 import {Icon} from '@/components/ui/Icon';
+import {selectPlatform} from '@/utils';
 
 const ToastItem: React.FC<{
   id: string;
@@ -169,15 +165,14 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 9999,
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    ...Platform.select({
+    ...(selectPlatform({
       ios: {
         paddingTop: spacing.xs,
       },
       android: {
         paddingTop: spacing.sm,
       },
-    }),
+    }) ?? {}),
   },
   toastContainer: {
     marginBottom: spacing.sm,

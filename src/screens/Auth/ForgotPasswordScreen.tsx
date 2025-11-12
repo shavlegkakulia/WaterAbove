@@ -12,9 +12,10 @@ import {
   FormCard,
   LinkLabel,
   AuthScreenWrapper,
-  Icon,
   Divider,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
+import { EnvelopeIcon } from '@/components/icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
@@ -33,12 +34,6 @@ const forgotPasswordSchema = z.object({
 });
 
 type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
-
-const EnvelopeIcon = () => (
-  <View style={styles.iconPlaceholder}>
-    <Icon name="Mail" size={18} color="#ffffff" />
-  </View>
-);
 
 export const ForgotPasswordScreen: React.FC = () => {
   const navigation =
@@ -139,7 +134,7 @@ export const ForgotPasswordScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   logo: {
-    marginTop: moderateScale(spacing.bordered),
+    marginTop: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(spacing.xxl),
   },
   title: {
@@ -157,12 +152,6 @@ const styles = StyleSheet.create({
     marginTop: moderateScale(spacing.md),
     alignSelf: 'center',
   },
-  iconPlaceholder: {
-    width: moderateScale(24),
-    height: moderateScale(24),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   createAccountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -171,7 +160,7 @@ const styles = StyleSheet.create({
     marginTop: moderateScale(25),
   },
   emptySpace: {
-    marginBottom: moderateScale(56),
+    marginBottom: moderateScale(56) - SVG_BORDER_HEIGHT,
   },
 });
 

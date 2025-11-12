@@ -11,6 +11,7 @@ import {
   CircularProgressBar,
   Switch,
   OptionPill,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
@@ -539,7 +540,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: moderateScale(spacing.xl),
+    marginTop: moderateScale(spacing.xl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(22),
     paddingHorizontal: moderateScale(spacing.xl),
   },
@@ -648,7 +649,7 @@ const styles = StyleSheet.create({
   footerText: {
     textAlign: 'center',
     paddingHorizontal: moderateScale(spacing.md),
-    marginBottom: moderateScale(spacing.xxl),
+    marginBottom: moderateScale(spacing.xxl) - SVG_BORDER_HEIGHT,
     color: '#C7DBD6',
   },
   sectionDivider: {

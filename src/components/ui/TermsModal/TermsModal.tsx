@@ -6,13 +6,12 @@ import {
   ScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Dimensions,
   TouchableOpacity,
 } from 'react-native';
 import { borderRadius, colors, spacing } from '@/theme';
 import { Text } from '@/components/ui/Typography';
 import { Button } from '@/components/ui/Button';
-import { moderateScale } from '@/utils';
+import { getWindowHeight, moderateScale } from '@/utils';
 import { BlurView } from '@react-native-community/blur';
 
 export interface TermsModalProps {
@@ -22,7 +21,7 @@ export interface TermsModalProps {
 }
 
 const TERMS_TEXT = `The Service is not available to any Users previously removed from the Service by TemplatesSite. You may be required to register with us in order to access and use certain features of the Service. If you choose to register for the Service, you agree to provide and maintain true, accurate, and current information as prompted by the Service's registration form. Registration data and certain other information about you are governed by our Privacy Policy. If you are under 16 years old, you The end.The Service is not available to any Users previously removed from the Service by TemplatesSite. You may be required to register with us in order to access and use certain features of the Service. If you choose to register for the Service, you agree to provide and maintain true, accurate, and current information as prompted by the Service's registration form. Registration data and certain other information about you are governed by our Privacy Policy. If you are under 16 years old, you The end.The Service is not available to any Users previously removed from the Service by TemplatesSite. You may be required to register with us in order to access and use certain features of the Service. If you choose to register for the Service, you agree to provide and maintain true, accurate, and current information as prompted by the Service's registration form. Registration data and certain other information about you are governed by our Privacy Policy. If you are under 16 years old, you The end.`;
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const SCREEN_HEIGHT = getWindowHeight();
 
 export const TermsModal: React.FC<TermsModalProps> = ({
   visible,

@@ -7,6 +7,7 @@ import {
   Text,
   FormCard,
   AuthScreenWrapper,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -43,7 +44,7 @@ export const PasswordUpdatedSuccessScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   logo: {
-    marginTop: moderateScale(110),
+    marginTop: moderateScale(110) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(spacing.bordered),
   },
   title: {
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     marginTop: moderateScale(spacing.xl),
-    marginBottom: moderateScale(110),
+    marginBottom: moderateScale(110) - SVG_BORDER_HEIGHT,
   },
 });
 

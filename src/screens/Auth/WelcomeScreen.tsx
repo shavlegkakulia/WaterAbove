@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
-import { Button, FormCard, Text } from '@/components';
+import { Button, FormCard, SVG_BORDER_HEIGHT, Text } from '@/components';
 import { AuthScreenWrapper } from '@/components/AuthScreenWrapper';
 import { spacing } from '@/theme';
 import { moderateScale } from '@/utils';
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileImageContainer: {
-    paddingTop: moderateScale(spacing.xxl),
+    paddingTop: moderateScale(spacing.xxl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(spacing.lg),
   },
   profileImage: {
@@ -115,6 +115,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     paddingHorizontal: moderateScale(spacing.md),
-    paddingBottom: moderateScale(spacing.xxl),
+    paddingBottom: moderateScale(spacing.xxl) - SVG_BORDER_HEIGHT,
   },
 });

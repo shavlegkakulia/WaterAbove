@@ -7,6 +7,7 @@ import {
   FormCard,
   AuthScreenWrapper,
   MailCheckIcon,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom:moderateScale(spacing.bordered),
-    marginTop: moderateScale(spacing.bordered),
+    marginTop: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT,
   },
   title: { textAlign: 'center', marginBottom: moderateScale(spacing.bordered) },
   subtitle: {
@@ -73,5 +74,5 @@ const styles = StyleSheet.create({
     color: '#D6E7E3',
     // Uses paragraphSmallBold variant from typography (14px, 700, 20 lineHeight)
   },
-  button: { width: '100%', marginBottom: moderateScale(spacing.bordered) },
+  button: { width: '100%', marginBottom: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT },
 });

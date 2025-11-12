@@ -11,6 +11,7 @@ import {
   Text,
   CircularProgressBar,
   FormInput,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { Icon } from '@/components/ui/Icon';
 import { colors, lineHeight, spacing } from '@/theme';
@@ -434,7 +435,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: moderateScale(spacing.xl),
+    marginTop: moderateScale(spacing.xl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(22),
     paddingHorizontal: moderateScale(spacing.xl),
   },
@@ -466,7 +467,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   scrollContent: {
-    paddingBottom: moderateScale(37),
+    paddingBottom: moderateScale(37) - SVG_BORDER_HEIGHT,
   },
   title: {
     textAlign: 'center',

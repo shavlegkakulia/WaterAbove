@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useForm, useFormState } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { spacing } from '@/theme';
@@ -11,20 +11,15 @@ import {
   Button,
   Text,
   FormInput,
-  Icon,
   FormCard,
   LinkLabel,
   AuthScreenWrapper,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
+import { EnvelopeIcon } from '@/components/icons';
 import { useEmailVerification, useToast } from '@/store/hooks';
 import { emailSchema, type EmailFormData } from '@/validation';
 import { moderateScale } from '@/utils';
-
-const EnvelopeIcon = () => (
-  <View style={styles.iconPlaceholder}>
-    <Icon name="Mail" size={18} color="#ffffff" />
-  </View>
-);
 
 export const VerificationScreen: React.FC = () => {
   const { isVerifying, verifyEmail } = useEmailVerification();
@@ -125,7 +120,7 @@ export const VerificationScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   logo: {
-    marginTop: moderateScale(spacing.bordered),
+    marginTop: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(spacing.bordered),
   },
   title: {
@@ -140,13 +135,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: moderateScale(spacing.bordered),
   },
-  iconPlaceholder: {
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   backToLoginLink: {
-    marginBottom: moderateScale(spacing.bordered),
+    marginBottom: moderateScale(spacing.bordered) - SVG_BORDER_HEIGHT,
   },
 });

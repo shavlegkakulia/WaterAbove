@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Platform, Dimensions } from 'react-native';
 import { env } from '@/config';
 import { getDefaultStore } from 'jotai';
 import {
@@ -11,8 +10,16 @@ import {
 import { authService } from './services/auth.service';
 import { queryClient } from './query/queryClient';
 import { storeAuthTokens, clearAuthTokens } from './utils/tokenStorage';
+import {
+  getWindowHeight,
+  getWindowWidth,
+  platformOS,
+  platformVersion,
+  selectPlatform,
+} from '@/utils';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const SCREEN_WIDTH = getWindowWidth();
+const SCREEN_HEIGHT = getWindowHeight();
 
 // Get base URL from environment
 const baseURL = env.API_BASE_URL;
@@ -23,11 +30,11 @@ const TOKEN_REFRESH_BUFFER_SECONDS = 120; // 2 minutes
 // Authorization is handled exclusively via Bearer tokens set by setAuthToken
 
 // Platform-specific params
-const platformParams = Platform.select({
+const platformParams =
+  selectPlatform({
   ios: { platform: 'ios' },
   android: { platform: 'android' },
-  default: {},
-});
+  }) ?? {};
 
 /**
  * Axios instance with pre-configured settings
@@ -95,8 +102,8 @@ apiClient.interceptors.request.use(
       config.data = {
         ...config.data,
         _metadata: {
-          platform: Platform.OS,
-          platformVersion: Platform.Version,
+          platform: platformOS,
+          platformVersion,
           screenWidth: SCREEN_WIDTH,
           screenHeight: SCREEN_HEIGHT,
           source: 'mobile_app',

@@ -13,6 +13,7 @@ import {
   AuthScreenWrapper,
   Input,
   PasswordVisibilityToggle,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
@@ -134,7 +135,7 @@ export const PasswordSetupScreen: React.FC = () => {
 const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
-    marginTop: moderateScale(spacing.xxxl),
+    marginTop: moderateScale(spacing.xxxl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(22),
   },
   subtitle: {
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    marginBottom: moderateScale(spacing.xxxl),
+    marginBottom: moderateScale(spacing.xxxl) - SVG_BORDER_HEIGHT,
   },
 });
 

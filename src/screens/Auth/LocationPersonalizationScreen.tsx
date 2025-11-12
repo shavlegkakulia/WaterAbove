@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } fro
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FormCard, FormInput, Button, Text, AuthScreenWrapper, CircularProgressBar, Switch } from '@/components';
+import { FormCard, FormInput, Button, Text, AuthScreenWrapper, CircularProgressBar, Switch, SVG_BORDER_HEIGHT } from '@/components';
 import { colors, fontSize, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
 import MapSvg from '@/assets/svg/map.svg';
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: moderateScale(spacing.xl),
+    marginTop: moderateScale(spacing.xl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(22),
   },
   title: {
@@ -815,7 +815,7 @@ const styles = StyleSheet.create({
   footerText: {
     textAlign: 'center',
     paddingHorizontal: moderateScale(spacing.md),
-    marginBottom: moderateScale(spacing.xxl),
+    marginBottom: moderateScale(spacing.xxl) - SVG_BORDER_HEIGHT,
     color: '#C7DBD6',
   },
 });

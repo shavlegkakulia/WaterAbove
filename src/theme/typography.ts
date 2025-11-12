@@ -1,13 +1,13 @@
-import { moderateScale } from '@/utils';
-import {TextStyle, Platform} from 'react-native';
+import { moderateScale, selectPlatform } from '@/utils';
+import {TextStyle} from 'react-native';
 import { fontSize, lineHeight } from './spacing';
 
 // Helvetica font family for cross-platform
-const helveticaFontFamily = Platform.select({
-  ios: 'Helvetica',
-  android: 'sans-serif', // Helvetica is not available on Android, using sans-serif as fallback
-  default: 'sans-serif',
-});
+const helveticaFontFamily =
+  selectPlatform({
+    ios: 'Helvetica',
+    android: 'sans-serif', // Helvetica is not available on Android, using sans-serif as fallback
+  }) ?? 'sans-serif';
 
 /**
  * Typography system organized by font size + line height combinations

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Image, LayoutChangeEvent, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, LayoutChangeEvent } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRoute } from '@react-navigation/native';
@@ -17,6 +17,7 @@ import {
   DatePicker,
   TermsModal,
   ImagePickerModal,
+  SVG_BORDER_HEIGHT,
 } from '@/components';
 import type { RootStackParamList } from '@/navigation/types';
 import { useToast } from '@/store/hooks';
@@ -24,7 +25,7 @@ import {
   personalizationSchema,
   type PersonalizationFormData,
 } from '@/validation';
-import { moderateScale } from '@/utils';
+import { moderateScale, isIOS } from '@/utils';
 import {
   useCheckUsernameAvailabilityMutation,
   useAcceptTermsMutation,
@@ -285,7 +286,7 @@ export const PersonalizationScreen: React.FC = () => {
     // Field name must be 'image' to match web API format
     // @ts-ignore - React Native FormData supports object with uri, type, name
     formData.append('image', {
-      uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri, // iOS needs file:// removed
+      uri: isIOS ? uri.replace('file://', '') : uri, // iOS needs file:// removed
       type,
       name: filename,
     } as FormDataPart);
@@ -365,7 +366,6 @@ export const PersonalizationScreen: React.FC = () => {
             },
             profileData: {
               dateOfBirth: formatDateForAPI(selectedDate),
-              termsAndConditions: true,
               avatarUrl: avatarUrl,
               profileCompletionPercentage: 50,
             },
@@ -529,7 +529,7 @@ export const PersonalizationScreen: React.FC = () => {
 const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
-    marginTop: moderateScale(spacing.xxxl),
+    marginTop: moderateScale(spacing.xxxl) - SVG_BORDER_HEIGHT,
     marginBottom: moderateScale(spacing.lg),
   },
   profileContainer: {
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    marginBottom: moderateScale(spacing.xxxl),
+    marginBottom: moderateScale(spacing.xxxl) - SVG_BORDER_HEIGHT,
   },
 });
 
