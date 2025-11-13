@@ -57,7 +57,7 @@ export const Button: React.FC<ButtonProps> = ({
     // Variant colors
     if (isDisabled) {
       baseStyle.backgroundColor = '#000';
-      baseStyle.opacity = 0.5;
+      baseStyle.opacity = 0.7;
     } else if (variant === 'primary') {
       baseStyle.backgroundColor = '#D6E7E3';
     } else if (variant === 'secondary') {
@@ -90,7 +90,7 @@ export const Button: React.FC<ButtonProps> = ({
     <TouchableOpacity
       style={[
         getButtonStyle(),
-        !isDisabled && shadows.sm,
+        // !isDisabled && shadows.sm,
         containerStyle,
         style,
       ]}

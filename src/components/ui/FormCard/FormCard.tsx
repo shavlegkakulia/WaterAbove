@@ -42,27 +42,47 @@ export const FormCard: React.FC<FormCardProps> = ({
         effect="clear"
         colorScheme="dark"
       >
-        <TopReflectiveBorderSvg
-          width={BORDER_WIDTH}
-          height={SVG_BORDER_HEIGHT}
-          radius={BORDER_RADIUS}
-          color={BORDER_COLOR}
-        />
-        <View style={cardContentStyle}>{children}</View>
-        <BottomReflectiveBorderSvg
-          width={BORDER_WIDTH}
-          height={SVG_BORDER_HEIGHT}
-          radius={BORDER_RADIUS}
-          color={BORDER_COLOR}
-        />
+        <LinearGradient
+          colors={[
+            'rgba(0, 0,0, 0.8)',
+            'rgba(8, 20,40, 0.9)',
+            'rgba(8, 20, 40, 0.8)',
+            'rgba(8, 20, 40, 0.8)',
+            'rgba(8, 20, 40, 0.8)',
+            'rgba(8, 20, 40, 0.4)',
+          ]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        >
+          <TopReflectiveBorderSvg
+            width={BORDER_WIDTH}
+            height={SVG_BORDER_HEIGHT}
+            radius={BORDER_RADIUS}
+            color={BORDER_COLOR}
+          />
+          <View style={cardContentStyle}>{children}</View>
+          <BottomReflectiveBorderSvg
+            width={BORDER_WIDTH}
+            height={SVG_BORDER_HEIGHT}
+            radius={BORDER_RADIUS}
+            color={BORDER_COLOR}
+          />
+        </LinearGradient>
       </LiquidGlassView>
     );
   }
 
   return (
-    <BlurView blurType="dark" blurAmount={8} style={[styles.cardBlur, style]}>
+    <BlurView blurType="light" blurAmount={8} style={[styles.cardBlur, style]}>
       <LinearGradient
-        colors={['rgba(8, 20, 31, 0.8)', 'rgba(0, 0, 0, 0)']}
+        colors={[
+          'rgba(0, 0,0, 0.9)',
+          'rgba(8, 20,40, 0.9)',
+          'rgba(8, 20, 40, 0.8)',
+          'rgba(8, 20, 40, 0.8)',
+          'rgba(8, 20, 40, 0.7)',
+          'rgba(8, 20, 40, 0.4)',
+        ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       >
