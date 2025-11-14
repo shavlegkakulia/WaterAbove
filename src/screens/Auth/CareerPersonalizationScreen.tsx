@@ -37,7 +37,7 @@ const EMPLOYMENT_STATUS_OPTIONS: Array<{
   value: UserEmploymentStatus;
   label: string;
 }> = [
-  { value: 'prefer-not-to-say', label: 'Prefer not to say' },
+  // { value: 'prefer-not-to-say', label: 'Prefer not to say' },
   { value: 'entrepreneur', label: 'Entrepreneur' },
   { value: 'self-employed', label: 'Self-Employed' },
   { value: 'homemaker', label: 'Homemaker' },
@@ -54,7 +54,7 @@ const EDUCATION_LEVEL_OPTIONS: Array<{
   value: UserLevelOfEducation;
   label: string;
 }> = [
-  { value: 'prefer-not-to-say', label: 'Prefer not to say' },
+  // { value: 'prefer-not-to-say', label: 'Prefer not to say' },
   { value: 'no-formal-education', label: 'No Formal Education' },
   { value: 'some-high-school', label: 'Some High School' },
   { value: 'high-school-diploma-ged', label: 'High School Diploma / GED' },

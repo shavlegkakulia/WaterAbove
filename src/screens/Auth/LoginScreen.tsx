@@ -50,6 +50,10 @@ export const LoginScreen: React.FC = () => {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    ['ერრორ1', 'ერრორ2', 'ერრორ3', 'ერრორ4', 'ერრორ5'].forEach(async (email) => {
+      showError(`Email ${email} is not valid`);
+    });
+    return;
     const result = await login(data.email, data.password);
 
     if (result?.success === true) {
@@ -79,7 +83,7 @@ export const LoginScreen: React.FC = () => {
         <Text variant="heading28Bold" color="textWhiteWA" style={styles.title}>
           {fromAlreadyVerified
             ? 'Email already verified'
-            : 'Login or create an account to get Started!'}
+            : 'Login -or- Create an Account to get Started!'}
         </Text>
 
         {/* Email Input */}

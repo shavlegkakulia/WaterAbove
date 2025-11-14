@@ -403,7 +403,7 @@ export const TopicsPersonalizationScreen: React.FC = () => {
             <View style={styles.toggleRow}>
               <View style={styles.toggleTextGroup}>
                 <Text variant="paragraph14Bold" style={styles.toggleLabel}>
-                  Share to help find members as you travel
+                  Activate to help find members while you are traveling
                 </Text>
               </View>
               <Switch

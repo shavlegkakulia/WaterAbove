@@ -138,6 +138,9 @@ export type PasswordSetupFormData = z.infer<typeof passwordSetupSchema>;
 
 // Personalization schema (after password setup)
 export const personalizationSchema = z.object({
+  fullName: z.string().optional(),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().optional(),
   username: z
     .string()
     .min(1, 'Username is required')

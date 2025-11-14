@@ -65,7 +65,7 @@ const ZODIAC_SIGNS: Array<{
 const GENDER_OPTIONS: Array<{ value: UserGender; label: string }> = [
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
-  { value: 'other', label: 'Other' },
+  // { value: 'other', label: 'Other' },
   { value: 'unspecified', label: 'Prefer not to say' },
 ];
 

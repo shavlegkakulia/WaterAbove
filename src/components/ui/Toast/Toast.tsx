@@ -12,28 +12,42 @@ const ToastItem: React.FC<{
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';
   message: string;
+  duration?: number;
+  sequenceDelay: number;
   onDismiss: (id: string) => void;
-}> = ({id, type, message, onDismiss}) => {
+}> = ({id, type, message, duration = 3000, sequenceDelay, onDismiss}) => {
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(-50)).current;
+  const dismissingRef = React.useRef(false);
+  const initialDelayRef = React.useRef(sequenceDelay);
+  const hasEnteredRef = React.useRef(false);
 
   useEffect(() => {
-    // Fade in and slide down
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    const delay = initialDelayRef.current;
+    const timer = setTimeout(() => {
+      hasEnteredRef.current = true;
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, delay);
+
+    return () => clearTimeout(timer);
   }, [fadeAnim, slideAnim]);
 
-  const handleDismiss = () => {
+  const handleDismiss = React.useCallback(() => {
+    if (dismissingRef.current) {
+      return;
+    }
+    dismissingRef.current = true;
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -47,8 +61,20 @@ const ToastItem: React.FC<{
       }),
     ]).start(() => {
       onDismiss(id);
+      dismissingRef.current = false;
     });
-  };
+  }, [fadeAnim, slideAnim, id, onDismiss]);
+
+  useEffect(() => {
+    if (!duration) {
+      return;
+    }
+    const delay = initialDelayRef.current + duration;
+    const timer = setTimeout(() => {
+      handleDismiss();
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [duration, handleDismiss]);
 
   const getToastStyle = () => {
     const baseStyle = {
@@ -142,14 +168,18 @@ export const Toast: React.FC = () => {
     return null;
   }
 
+  const orderedToasts = [...toasts].sort((a, b) => a.sequence - b.sequence);
+
   return (
     <SafeAreaView style={styles.container} edges={['top']} pointerEvents="box-none">
-      {toasts.map((toast) => (
+      {orderedToasts.map((toast) => (
         <ToastItem
           key={toast.id}
           id={toast.id}
           type={toast.type}
           message={toast.message}
+          duration={toast.duration}
+          sequenceDelay={toast.sequence * 500}
           onDismiss={removeToast}
         />
       ))}

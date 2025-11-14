@@ -79,7 +79,7 @@ export const VerificationScreen: React.FC = () => {
 
         {/* Title */}
         <Text variant="heading28Bold" color="textWhiteWA" style={styles.title}>
-          Register and verify your account to access the platform
+          Register and Verify your Account to access the Platform
         </Text>
 
         {/* Email Input */}

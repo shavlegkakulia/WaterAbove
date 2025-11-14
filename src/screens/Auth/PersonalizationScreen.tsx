@@ -74,6 +74,9 @@ export const PersonalizationScreen: React.FC = () => {
     mode: 'onChange',
     defaultValues: {
       username: '',
+      fullName: '',
+      firstName: '',
+      lastName: '',
       dateOfBirth: '',
       acceptTerms: false,
     },
@@ -81,7 +84,7 @@ export const PersonalizationScreen: React.FC = () => {
 
   const username = watch('username');
   const usernameCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  
   // TanStack mutations
   const checkUsernameMutation = useCheckUsernameAvailabilityMutation();
   const acceptTermsMutation = useAcceptTermsMutation();
@@ -363,6 +366,9 @@ export const PersonalizationScreen: React.FC = () => {
           {
             userData: {
               username: data.username,
+              firstName: data.firstName,
+              lastName: '',
+              fullName: data.firstName,
             },
             profileData: {
               dateOfBirth: formatDateForAPI(selectedDate),
@@ -436,9 +442,22 @@ export const PersonalizationScreen: React.FC = () => {
         <View style={styles.input}>
           <FormInput
             control={control}
+            autoCorrect={false}
             name="username"
             label="Select User Name"
             placeholder="Enter your username"
+            containerStyle={styles.input}
+            helpText="Create a unique username for your profileNo symbols, limit numbers, and first character must be a letter."
+          />
+        </View>
+
+        {/* Display Name Input */}
+        <View style={styles.input}>
+          <FormInput
+            control={control}
+            name="firstName"
+            label="Select Display Name"
+            placeholder="Enter your display name"
             containerStyle={styles.input}
             helpText="Use your real name to help build genuine connections"
           />
@@ -549,7 +568,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    marginBottom: moderateScale(spacing.md),
+    marginBottom: moderateScale(spacing.sm),
   },
   datePickerTouchable: {
     width: '100%',
