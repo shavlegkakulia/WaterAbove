@@ -2,7 +2,7 @@ import React from 'react';
 import { Keyboard, Pressable, StyleSheet, View, ViewStyle } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 import { borderRadius, spacing } from '@/theme';
-import { getWindowWidth, moderateScale } from '@/utils';
+import { getWindowWidth, isIOS, moderateScale } from '@/utils';
 import {
   BottomReflectiveBorderSvg,
   TopReflectiveBorderSvg,
@@ -29,81 +29,76 @@ export const FormCard: React.FC<FormCardProps> = ({
   style,
   hasHorizontalPadding = true,
 }) => {
+  const supportsBlurView = isIOS;
   const cardContentStyle = {
     ...styles.cardContent,
     paddingHorizontal: hasHorizontalPadding ? moderateScale(spacing.xl) : 0,
   };
 
+  const renderCardBody = () => (
+    <>
+      <TopReflectiveBorderSvg
+        width={BORDER_WIDTH}
+        height={SVG_BORDER_HEIGHT}
+        radius={BORDER_RADIUS}
+        color={BORDER_COLOR}
+      />
+      <Pressable onPress={() => Keyboard.dismiss()}>
+        <View style={cardContentStyle}>{children}</View>
+      </Pressable>
+      <BottomReflectiveBorderSvg
+        width={BORDER_WIDTH}
+        height={SVG_BORDER_HEIGHT}
+        radius={BORDER_RADIUS}
+        color={BORDER_COLOR}
+      />
+    </>
+  );
+
+  const renderGradient = () => (
+    <LinearGradient
+      colors={[
+        'rgba(0, 0, 0, 0.9)',
+        'rgba(8, 20, 40, 0.9)',
+        'rgba(8, 20, 40, 0.8)',
+        'rgba(8, 20, 40, 0.8)',
+        'rgba(8, 20, 40, 0.7)',
+        'rgba(8, 20, 40, 0.4)',
+      ]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
+      {renderCardBody()}
+    </LinearGradient>
+  );
+
   if (isLiquidGlassSupported) {
     return (
       <LiquidGlassView
-        style={[styles.card]}
+        style={[styles.card, style]}
         interactive
         effect="clear"
         colorScheme="dark"
       >
-        <LinearGradient
-          colors={[
-            'rgba(0, 0,0, 0.8)',
-            'rgba(8, 20,40, 0.9)',
-            'rgba(8, 20, 40, 0.8)',
-            'rgba(8, 20, 40, 0.8)',
-            'rgba(8, 20, 40, 0.8)',
-            'rgba(8, 20, 40, 0.4)',
-          ]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-        >
-          <TopReflectiveBorderSvg
-            width={BORDER_WIDTH}
-            height={SVG_BORDER_HEIGHT}
-            radius={BORDER_RADIUS}
-            color={BORDER_COLOR}
-          />
-          <View style={cardContentStyle}>{children}</View>
-          <BottomReflectiveBorderSvg
-            width={BORDER_WIDTH}
-            height={SVG_BORDER_HEIGHT}
-            radius={BORDER_RADIUS}
-            color={BORDER_COLOR}
-          />
-        </LinearGradient>
+        {renderGradient()}
       </LiquidGlassView>
     );
   }
 
-  return (
-    <BlurView blurType="light" blurAmount={8} style={[styles.cardBlur, style]}>
-      <LinearGradient
-        colors={[
-          'rgba(0, 0,0, 0.9)',
-          'rgba(8, 20,40, 0.9)',
-          'rgba(8, 20, 40, 0.8)',
-          'rgba(8, 20, 40, 0.8)',
-          'rgba(8, 20, 40, 0.7)',
-          'rgba(8, 20, 40, 0.4)',
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
+  if (supportsBlurView) {
+    return (
+      <BlurView
+        blurType="light"
+        blurAmount={8}
+        style={[styles.cardBlur, style]}
       >
-        <TopReflectiveBorderSvg
-          width={BORDER_WIDTH}
-          height={SVG_BORDER_HEIGHT}
-          radius={BORDER_RADIUS}
-          color={BORDER_COLOR}
-        />
-        <Pressable onPress={() => Keyboard.dismiss()}>
-          <View style={cardContentStyle}>{children}</View>
-        </Pressable>
-        <BottomReflectiveBorderSvg
-          width={BORDER_WIDTH}
-          height={SVG_BORDER_HEIGHT}
-          radius={BORDER_RADIUS}
-          color={BORDER_COLOR}
-        />
-      </LinearGradient>
-    </BlurView>
-  );
+        {renderGradient()}
+      </BlurView>
+    );
+  }
+
+  // Android fallback: BlurView causes runtime issues on some devices.
+  return <View style={[styles.cardFallback, style]}>{renderGradient()}</View>;
 };
 
 const styles = StyleSheet.create({
@@ -116,7 +111,11 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: moderateScale(borderRadius.xxl),
     overflow: 'hidden',
-    // backgroundColor: 'rgba(8, 20, 34, 0)',
+  },
+  cardFallback: {
+    width: '100%',
+    borderRadius: moderateScale(borderRadius.xxl),
+    overflow: 'hidden',
   },
   cardContent: {
     alignItems: 'center',
