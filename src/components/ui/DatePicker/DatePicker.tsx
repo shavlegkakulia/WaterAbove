@@ -100,9 +100,7 @@ export default function DatePicker({
   };
 
   const getMonthString = (month: number) =>
-    monthMap[Math.max(Math.min(11, month), 0)].long[
-      'en' as keyof IMonthMap["long"]
-    ] || "Month";
+    monthMap[Math.max(Math.min(11, month), 0)].long.en || "Month";
 
 
   const selectYear = (year: number) => {

@@ -9,12 +9,14 @@ import Svg, {
   Filter,
   FeGaussianBlur,
 } from 'react-native-svg';
+import { StyleProp, ViewStyle } from 'react-native';
 
 type SvgProps = {
   width: number;
   height?: number;
   radius?: number;
   color?: string;
+  style?: StyleProp<ViewStyle>;
 };
 
 export function TopReflectiveBorderSvg({
@@ -22,6 +24,7 @@ export function TopReflectiveBorderSvg({
   height = 20,
   radius = 36,
   color = '#7d828a',
+  style,
 }: SvgProps) {
   const r = radius;
   const glowStripH = Math.max(34, Math.floor(r * 1.4));
@@ -38,7 +41,7 @@ export function TopReflectiveBorderSvg({
     `;
 
   return (
-    <Svg width={width} height={svgHeight}>
+    <Svg width={width} height={svgHeight} style={style}>
       <Defs>
         <LinearGradient id="fadeX" x1="0" y1="0" x2="1" y2="0">
           <Stop offset="0" stopColor="#fff" stopOpacity="0" />

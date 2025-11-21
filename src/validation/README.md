@@ -1,6 +1,6 @@
 # Form Validation with Zod + React Hook Form
 
-ეს პროექტი იყენებს **Zod** validation schemas-ებისთვის და **React Hook Form** forms management-ისთვის.
+This project uses **Zod** for validation schemas and **React Hook Form** for forms management.
 
 ## 📦 Packages
 
@@ -12,21 +12,21 @@
 }
 ```
 
-## ✨ უპირატესობები
+## ✨ Advantages
 
 ### Zod:
-- ✅ **TypeScript-first** - schemas აგენერირებს types-ს
-- ✅ **Runtime validation** - type-safe რანტაიმში
-- ✅ **Composable** - schemas შეიძლება დავაკომპოზიტოთ
-- ✅ **Rich validation** - ბევრი built-in validator
+- ✅ **TypeScript-first** - schemas generate types
+- ✅ **Runtime validation** - type-safe at runtime
+- ✅ **Composable** - schemas can be composed
+- ✅ **Rich validation** - many built-in validators
 
 ### React Hook Form:
 - ✅ **Performance** - minimal re-renders
-- ✅ **Simple API** - მარტივი გამოსაყენებელი
+- ✅ **Simple API** - easy to use
 - ✅ **No dependencies** - lightweight
-- ✅ **TypeScript support** - სრული type safety
+- ✅ **TypeScript support** - full type safety
 
-## 📂 სტრუქტურა
+## 📂 Structure
 
 ```
 src/validation/
@@ -39,7 +39,7 @@ src/validation/
 
 ## 🎯 Schema Definition (Zod)
 
-### მარტივი Schema
+### Simple Schema
 
 ```typescript
 import {z} from 'zod';

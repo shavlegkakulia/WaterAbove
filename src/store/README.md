@@ -1,19 +1,19 @@
 # Jotai State Management
 
-ეს პროექტი იყენებს **Jotai** (v2.15.0) state management-ისთვის.
+This project uses **Jotai** (v2.15.0) for state management.
 
-## 📦 რა არის Jotai?
+## 📦 What is Jotai?
 
-Jotai არის პრიმიტიული და მოქნილი state management library React-ისთვის. ის იყენებს **atoms** (ატომებს) - მცირე, დამოუკიდებელ state units-ს.
+Jotai is a primitive and flexible state management library for React. It uses **atoms** - small, independent state units.
 
-### უპირატესობები:
-- ✅ **მარტივი API** - მსგავსია React's useState-ს
-- ✅ **TypeScript მხარდაჭერა** - სრული type safety
-- ✅ **Atomic design** - ნებისმიერი კომპონენტი ხვდება მხოლოდ იმ state-ს რაც სჭირდება
-- ✅ **No boilerplate** - არ სჭირდება actions, reducers, providers
-- ✅ **DevTools** - jotai-devtools თვალთვალისთვის
+### Advantages:
+- ✅ **Simple API** - similar to React's useState
+- ✅ **TypeScript support** - full type safety
+- ✅ **Atomic design** - components only access the state they need
+- ✅ **No boilerplate** - no need for actions, reducers, providers
+- ✅ **DevTools** - jotai-devtools for monitoring
 
-## 📂 სტრუქტურა
+## 📂 Structure
 
 ```
 src/store/
@@ -28,11 +28,11 @@ src/store/
 └── README.md
 ```
 
-## 🎯 როგორ გამოვიყენოთ
+## 🎯 How to Use
 
 ### 1. Atoms - State Definition
 
-Atoms არის state-ის ცალკეული ნაწილები:
+Atoms are individual pieces of state:
 
 ```typescript
 import {atom} from 'jotai';
@@ -69,7 +69,7 @@ export const useAuth = () => {
 };
 ```
 
-### 3. კომპონენტში გამოყენება
+### 3. Usage in Components
 
 ```typescript
 import {useAuth} from '@/store/hooks';
@@ -90,7 +90,7 @@ const ProfileScreen = () => {
 };
 ```
 
-## 📋 არსებული Atoms და Hooks
+## 📋 Available Atoms and Hooks
 
 ### 🔐 Authentication (`authAtoms.ts` & `useAuth.ts`)
 
@@ -132,7 +132,7 @@ const {showSuccess, showError, showWarning, showInfo} = useToast();
 const {isOpen, openModal, closeModal} = useModal();
 ```
 
-## 📝 მაგალითები
+## 📝 Examples
 
 ### Email Verification (VerificationScreen)
 
@@ -201,12 +201,12 @@ const SettingsScreen = () => {
 
 ## 🔄 Persisted State (AsyncStorage)
 
-ზოგიერთი atom ინახება AsyncStorage-ში:
+Some atoms are stored in AsyncStorage:
 
 ```typescript
 import {atomWithStorage} from 'jotai/utils';
 
-// ავტომატურად sync-დება AsyncStorage-თან
+// Automatically syncs with AsyncStorage
 export const authTokenAtom = atomWithStorage<string | null>(
   'auth_token', 
   null
@@ -215,7 +215,7 @@ export const authTokenAtom = atomWithStorage<string | null>(
 
 ## 🛠️ DevTools
 
-jotai-devtools-ის გამოსაყენებლად:
+To use jotai-devtools:
 
 ```typescript
 import {DevTools} from 'jotai-devtools';
@@ -230,7 +230,7 @@ function App() {
 }
 ```
 
-## 📚 დამატებითი რესურსები
+## 📚 Additional Resources
 
 - [Jotai Documentation](https://jotai.org/)
 - [Jotai Utils](https://jotai.org/docs/utilities/storage)
@@ -238,11 +238,11 @@ function App() {
 
 ## ✨ Best Practices
 
-1. **Keep atoms small** - ერთი atom = ერთი state piece
-2. **Use derived atoms** - computed values-ისთვის
-3. **Custom hooks** - business logic-ისთვის
-4. **Type everything** - TypeScript ყოველთვის
-5. **Persist sparingly** - მხოლოდ რაც ნამდვილად სჭირდება
+1. **Keep atoms small** - one atom = one state piece
+2. **Use derived atoms** - for computed values
+3. **Custom hooks** - for business logic
+4. **Type everything** - TypeScript always
+5. **Persist sparingly** - only what's really needed
 
 ---
 

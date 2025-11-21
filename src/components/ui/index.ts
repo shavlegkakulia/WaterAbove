@@ -16,4 +16,8 @@ export * from './TermsModal';
 export * from './ImagePickerModal';
 export * from './Switch';
 export * from './OptionPill';
+export * from './Header';
+export * from './CompletedCircle';
+export * from './BackButton';
+export * from './PrimaryActionButton';
 

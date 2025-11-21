@@ -2,6 +2,7 @@ declare module 'react-native-config' {
   export interface NativeConfig {
     // API
     API_BASE_URL?: string;
+    HOST_URL?: string;
     API_USERNAME?: string;
     API_PASSWORD?: string;
 

@@ -74,7 +74,6 @@ export const LifestylePersonalizationScreen: React.FC = () => {
   const updateUserMutation = useUpdateUserMutation();
   const { data: userData } = useUserQuery();
 
-  const emailFromParams = route.params?.email;
   const initialPercentage = route.params?.profileCompletionPercentage ?? 90;
   const userProfileFromRoute = route.params?.userProfile;
   const [profileCompletionPercentage, setProfileCompletionPercentage] =
@@ -219,12 +218,7 @@ export const LifestylePersonalizationScreen: React.FC = () => {
 
         showSuccess('Profile updated successfully!');
 
-        const resolvedEmail =
-          emailFromParams ?? userData?.data?.user?.email ?? '';
-
-        navigation.navigate('ProfileCompleted', {
-          email: resolvedEmail,
-        });
+        navigation.navigate('ProfileCompleted');
       }
     } catch (error) {
       console.error('Failed to update lifestyle details:', error);
@@ -232,11 +226,7 @@ export const LifestylePersonalizationScreen: React.FC = () => {
   };
 
   const handleSkip = () => {
-    const resolvedEmail = emailFromParams ?? userData?.data?.user?.email ?? '';
-
-    navigation.navigate('ProfileCompleted', {
-      email: resolvedEmail,
-    });
+    navigation.navigate('ProfileCompleted');
   };
 
   return (

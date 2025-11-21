@@ -6,13 +6,11 @@ import { CommonActions } from '@react-navigation/native';
 import { AuthScreenWrapper, ProfileCompletedIcon, Text } from '@/components';
 import { colors, lineHeight, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
-import { useAppNavigation, useAppRoute } from '@/navigation';
+import { useAppNavigation } from '@/navigation';
 import { useUpdateUserMutation } from '@/api/query';
 
 export const ProfileCompletedScreen: React.FC = () => {
   const navigation = useAppNavigation<'ProfileCompleted'>();
-  const route = useAppRoute<'ProfileCompleted'>();
-  const email = route.params?.email;
   const [isCtaPressed, setIsCtaPressed] = React.useState(false);
   const updateUserMutation = useUpdateUserMutation();
   const hasUpdatedRef = React.useRef(false);
@@ -45,7 +43,7 @@ export const ProfileCompletedScreen: React.FC = () => {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'Login', params: { email } }],
+        routes: [{ name: 'ArchiveHome' }],
       }),
     );
   };

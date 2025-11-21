@@ -73,7 +73,6 @@ export const CareerPersonalizationScreen: React.FC = () => {
   const updateUserMutation = useUpdateUserMutation();
   const { data: userData } = useUserQuery();
 
-  const emailFromParams = route.params?.email;
   const initialPercentage = route.params?.profileCompletionPercentage ?? 80;
   const userProfileFromRoute = route.params?.userProfile;
   const [profileCompletionPercentage, setProfileCompletionPercentage] =
@@ -204,9 +203,6 @@ export const CareerPersonalizationScreen: React.FC = () => {
         }
 
         showSuccess('Profile updated successfully!');
-        const resolvedEmail =
-          emailFromParams ?? userData?.data?.user?.email ?? '';
-
         const targetProfile =
           updatedProfile ??
           userProfile ??
@@ -216,12 +212,9 @@ export const CareerPersonalizationScreen: React.FC = () => {
         const shouldSkipLifestyle = isUnderMinimumAge(age);
 
         if (shouldSkipLifestyle) {
-          navigation.navigate('ProfileCompleted', {
-            email: resolvedEmail,
-          });
+          navigation.navigate('ProfileCompleted');
         } else {
           navigation.navigate('LifestylePersonalization', {
-            email: resolvedEmail,
             profileCompletionPercentage:
               updatedPercentage ?? profileCompletionPercentage,
             userProfile: updatedProfile ?? userProfile ?? undefined,
@@ -234,21 +227,16 @@ export const CareerPersonalizationScreen: React.FC = () => {
   };
 
   const handleSkip = () => {
-    const resolvedEmail = emailFromParams ?? userData?.data?.user?.email ?? '';
-
     const age = getAgeFromProfile(
       userProfile ?? userData?.data?.user?.profile ?? null,
     );
 
     if (isUnderMinimumAge(age)) {
-      navigation.navigate('ProfileCompleted', {
-        email: resolvedEmail,
-      });
+      navigation.navigate('ProfileCompleted');
       return;
     }
 
     navigation.navigate('LifestylePersonalization', {
-      email: resolvedEmail,
       profileCompletionPercentage,
       userProfile: userProfile ?? undefined,
     });

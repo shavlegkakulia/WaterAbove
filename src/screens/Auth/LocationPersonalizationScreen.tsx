@@ -29,7 +29,6 @@ type LocationFormData = z.infer<typeof locationSchema>;
 export const LocationPersonalizationScreen: React.FC = () => {
   const navigation = useAppNavigation<'LocationPersonalization'>();
   const route = useAppRoute<'LocationPersonalization'>();
-  const email = route.params?.email || '';
 
   const userLocation = route.params?.userLocation;
   const [profileCompletionPercentage, setProfileCompletionPercentage] = useState(
@@ -271,8 +270,7 @@ export const LocationPersonalizationScreen: React.FC = () => {
             // Navigate to next screen (ProfilePersonalization)
             // Get user profile from response
             const userProfile = userUpdateResponse.data.user?.profile;
-            navigation.navigate('ProfilePersonalization', { 
-              email, 
+            navigation.navigate('ProfilePersonalization', {  
               profileCompletionPercentage: updatedPercentage || 50,
               userProfile,
             });

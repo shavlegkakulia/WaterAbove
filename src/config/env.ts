@@ -18,6 +18,7 @@ import Config from 'react-native-config';
 export interface Environment {
   // API
   API_BASE_URL: string;
+  HOST_URL: string;
   API_USERNAME?: string;
   API_PASSWORD?: string;
 
@@ -46,6 +47,7 @@ const parseBoolean = (value: string | undefined): boolean => {
 export const env: Environment = {
   // API
   API_BASE_URL: Config.API_BASE_URL || 'https://b2aa9968f63a.ngrok.app/api/v1',
+  HOST_URL: Config.HOST_URL || 'https://b2aa9968f63a.ngrok.app',
   API_USERNAME: Config.API_USERNAME,
   API_PASSWORD: Config.API_PASSWORD,
 

@@ -60,10 +60,7 @@ export function getInitialNavigationRoute(
 
   // Step 4: Location setup
   if (isVerified && hasPassword && hasUsername && !hasUserLocation) {
-    if (!email) {
-      return { name: 'Login' };
-    }
-    return { name: 'LocationPersonalization', params: { email } };
+    return { name: 'LocationPersonalization' };
   }
 
   const profileCompletionPercentage =
@@ -72,13 +69,9 @@ export function getInitialNavigationRoute(
     hasUserLocation && profileCompletionPercentage >= 100;
 
   if (!isProfileComplete) {
-    if (!email) {
-      return { name: 'Login' };
-    }
     return {
       name: 'LocationPersonalization',
       params: {
-        email,
         userLocation: apiUser.userLocation ?? undefined,
         profileCompletionPercentage:
           apiUser.profile?.profileCompletionPercentage ?? undefined,
@@ -90,9 +83,11 @@ export function getInitialNavigationRoute(
     return { name: 'Login' };
   }
 
-  if (apiUser.profile?.profileCompletionPercentage === 100) {
+  // If profile is 100% complete and user is authenticated, go to ArchiveHome
+  const isAuthenticated = isVerified && hasPassword;
+  if (isAuthenticated && apiUser.profile?.profileCompletionPercentage === 100) {
     return {
-      name: 'Login',
+      name: 'ArchiveHome',
     };
   }
 

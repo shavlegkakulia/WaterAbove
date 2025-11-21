@@ -8,17 +8,20 @@ export type RootStackParamList = {
   EmailVerifiedSuccess: { email: string };
   PasswordSetup: { email: string };
   Personalization: { email: string };
-  LocationPersonalization: { email: string; userLocation?: ApiUser['userLocation']; profileCompletionPercentage?: number };
-  ProfilePersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
-  TopicsPersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
-  CareerPersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
-  LifestylePersonalization: { email: string; profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
-  ProfileCompleted: { email: string };
+  LocationPersonalization: { userLocation?: ApiUser['userLocation']; profileCompletionPercentage?: number };
+  ProfilePersonalization: { profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  TopicsPersonalization: { profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  CareerPersonalization: { profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  LifestylePersonalization: { profileCompletionPercentage?: number; userProfile?: ApiUser['profile'] };
+  ProfileCompleted: undefined;
   Welcome: { avatarUrl?: string; avatarBase64?: string; email?: string };
   ForgotPassword: undefined;
   CheckInbox: { email: string };
   SetNewPassword: { email: string; resetCode: string };
   PasswordUpdatedSuccess: undefined;
+  ArchiveHome: undefined;
+  CourseDetail: { courseId?: string; courseTitle?: string; progress?: number };
+  LessonDetailVideo: { lessonId?: string; lessonTitle?: string; progress?: number };
   // Add more screens here as you build them
 };
 

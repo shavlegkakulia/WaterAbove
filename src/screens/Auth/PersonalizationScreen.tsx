@@ -367,7 +367,7 @@ export const PersonalizationScreen: React.FC = () => {
             userData: {
               username: data.username,
               firstName: data.firstName,
-              lastName: '',
+              lastName: data.firstName,
               fullName: data.firstName,
             },
             profileData: {
@@ -573,18 +573,11 @@ const styles = StyleSheet.create({
   datePickerTouchable: {
     width: '100%',
   },
-  calendarIcon: {
-    padding: moderateScale(4),
-  },
   calendarIconContainer: {
     padding: moderateScale(4),
   },
   checkbox: {
     marginBottom: moderateScale(spacing.lg),
-  },
-  helpText: {
-    marginTop: moderateScale(spacing.xs),
-    marginLeft: moderateScale(spacing.md),
   },
   button: {
     width: '100%',

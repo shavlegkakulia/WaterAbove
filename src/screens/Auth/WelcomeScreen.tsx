@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Button, FormCard, SVG_BORDER_HEIGHT, Text } from '@/components';
 import { AuthScreenWrapper } from '@/components/AuthScreenWrapper';
 import { spacing } from '@/theme';
@@ -10,16 +11,14 @@ import { colors } from '@/theme/colors';
 import type { RootStackParamList } from '@/navigation/types';
 
 export const WelcomeScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'Welcome'>>();
   const avatarUrl = route.params?.avatarUrl;
   const avatarBase64 = route.params?.avatarBase64;
 
   const handleLetsDoThis = () => {
     // Navigate to Location Personalization screen
-    // Get email from route params if available, or use empty string
-    const email = route.params?.email || '';
-    navigation.navigate('LocationPersonalization', { email });
+    navigation.navigate('LocationPersonalization', {});
   };
   return (
     <AuthScreenWrapper>

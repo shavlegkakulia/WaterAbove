@@ -22,6 +22,7 @@ import {
   PasswordUpdatedSuccessScreen,
 } from '@/screens/Auth';
 import {RootStackParamList} from './types';
+import { MainDrawerNavigator } from './MainDrawerNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -55,6 +56,11 @@ export const RootNavigator: React.FC = () => {
         <Stack.Screen name="CheckInbox" component={CheckInboxScreen} />
         <Stack.Screen name="SetNewPassword" component={SetNewPasswordScreen} />
         <Stack.Screen name="PasswordUpdatedSuccess" component={PasswordUpdatedSuccessScreen} />
+        <Stack.Screen 
+          name="ArchiveHome" 
+          component={MainDrawerNavigator}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

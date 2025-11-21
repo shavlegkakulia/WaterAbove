@@ -16,4 +16,7 @@ export * from './CheckInboxScreen';
 export * from './SetNewPasswordScreen';
 export * from './PasswordUpdatedSuccessScreen';
 export * from './InitializingScreen';
+export * from './ArchiveHomeScreen';
+export * from './CourseDetailScreen';
+export * from './LessonDetailVideoScreen';
 

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from '@tanstack/react-query';
 import { spacing } from '@/theme';
 import {
   Logo,
@@ -24,6 +25,11 @@ import type { RootStackParamList } from '@/navigation/types';
 import { useAuth, useToast } from '@/store/hooks';
 import { loginSchema, type LoginFormData } from '@/validation';
 import { moderateScale } from '@/utils';
+import { useSetAtom, useAtomValue } from 'jotai';
+import { authTokenAtom, userAtom, isAuthenticatedAtom } from '@/store/atoms';
+import { authService, setAuthToken as setAxiosAuthToken } from '@/api';
+import { getInitialNavigationRoute } from '@/utils/navigation';
+import { queryKeys } from '@/api/query';
 
 export const LoginScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'Login'>>();
@@ -35,6 +41,22 @@ export const LoginScreen: React.FC = () => {
   const { showSuccess, showError } = useToast();
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [shouldFetchStatus, setShouldFetchStatus] = useState(false);
+  const token = useAtomValue(authTokenAtom);
+  const setToken = useSetAtom(authTokenAtom);
+  const setUser = useSetAtom(userAtom);
+  const setIsAuthenticated = useSetAtom(isAuthenticatedAtom);
+
+  // Use query to fetch status after login
+  const {
+    data: statusResponse,
+    refetch: refetchStatus,
+  } = useQuery({
+    queryKey: [...queryKeys.auth.session, token] as const,
+    queryFn: () => authService.getStatus(),
+    enabled: shouldFetchStatus && !!token,
+    retry: false,
+  });
 
   const {
     control,
@@ -49,17 +71,68 @@ export const LoginScreen: React.FC = () => {
     },
   });
 
+  // Handle status response when it's available
+  useEffect(() => {
+    if (statusResponse?.success && statusResponse.data) {
+      const { tokens, user: apiUser } = statusResponse.data;
+
+      // Update tokens if available
+      if (tokens?.accessToken) {
+        setToken(tokens.accessToken);
+        setAxiosAuthToken(tokens.accessToken);
+      }
+
+      // Update user if available
+      if (apiUser) {
+        setUser({
+          id: apiUser.id || '',
+          email: apiUser.email || '',
+          name: apiUser.fullName || apiUser.username || undefined,
+          avatar: apiUser.profile?.avatarUrl || undefined,
+        });
+      }
+
+      // Determine navigation route based on user status
+      const navigationRoute = getInitialNavigationRoute(apiUser);
+
+      // Set authentication state
+      const isAuthenticated =
+        apiUser?.isVerified === true && apiUser?.hasPassword === true;
+      setIsAuthenticated(isAuthenticated);
+
+      // Navigate to determined route
+      navigation.reset({
+        index: 0,
+        routes: navigationRoute.params
+          ? [{ name: navigationRoute.name, params: navigationRoute.params }]
+          : [{ name: navigationRoute.name }],
+      });
+
+      showSuccess('Welcome back!');
+      setShouldFetchStatus(false);
+    } else if (statusResponse && !statusResponse.success) {
+      // Fallback to ArchiveHome if status check fails
+      navigation.navigate('ArchiveHome');
+      showSuccess('Welcome back!');
+      setShouldFetchStatus(false);
+    }
+  }, [statusResponse, setToken, setUser, setIsAuthenticated, navigation, showSuccess]);
+
+  // Watch for token changes and trigger status fetch
+  useEffect(() => {
+    if (shouldFetchStatus && token) {
+      refetchStatus();
+    }
+  }, [token, shouldFetchStatus, refetchStatus]);
+
   const onSubmit = async (data: LoginFormData) => {
-    ['ერრორ1', 'ერრორ2', 'ერრორ3', 'ერრორ4', 'ერრორ5'].forEach(async (email) => {
-      showError(`Email ${email} is not valid`);
-    });
-    return;
     const result = await login(data.email, data.password);
 
     if (result?.success === true) {
-      showSuccess('Welcome back!');
-      // Navigation will be handled by auth state change
-      navigation.navigate('LocationPersonalization', { email: data.email }); // TODO: Change to needed screen
+      // Trigger status query fetch
+      // Token will be set by useLoginMutation's onSuccess via storeAuthTokens
+      // We just need to enable the query and wait for token to be available
+      setShouldFetchStatus(true);
     } else {
       showError(result.error || 'Login failed. Please try again.');
     }

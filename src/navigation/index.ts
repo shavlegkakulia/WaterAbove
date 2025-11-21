@@ -2,4 +2,5 @@ export * from './RootNavigator';
 export * from './types';
 export {navigationRef} from './RootNavigator';
 export * from './hooks';
+export * from './MainDrawerNavigator';
 

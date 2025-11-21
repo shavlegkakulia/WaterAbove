@@ -108,7 +108,6 @@ const formatDateForDisplay = (date: Date): string => {
 export const ProfilePersonalizationScreen: React.FC = () => {
   const navigation = useAppNavigation<'ProfilePersonalization'>();
   const route = useAppRoute<'ProfilePersonalization'>();
-  const emailParam = route.params?.email;
   const initialPercentage = route.params?.profileCompletionPercentage || 50;
   const userProfileFromRoute = route.params?.userProfile;
   const { showSuccess } = useToast();
@@ -308,11 +307,7 @@ export const ProfilePersonalizationScreen: React.FC = () => {
           setProfileCompletionPercentage(updatedPercentage);
         }
         showSuccess('Profile updated successfully!');
-        const resolvedEmail =
-          emailParam || userData?.data?.user?.email || null;
-
         navigation.navigate('TopicsPersonalization', {
-          email: resolvedEmail ?? '',
           profileCompletionPercentage:
             updatedPercentage ?? profileCompletionPercentage,
           userProfile: updatedProfile,

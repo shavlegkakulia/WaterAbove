@@ -88,11 +88,11 @@ export const FormCard: React.FC<FormCardProps> = ({
   if (supportsBlurView) {
     return (
       <BlurView
-        blurType="light"
+       
         blurAmount={8}
         style={[styles.cardBlur, style]}
       >
-        {renderGradient()}
+        {renderCardBody()}
       </BlurView>
     );
   }

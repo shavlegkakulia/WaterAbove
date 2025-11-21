@@ -76,7 +76,6 @@ export const TopicsPersonalizationScreen: React.FC = () => {
   const updateUserMutation = useUpdateUserMutation();
   const { data: userData } = useUserQuery();
 
-  const emailFromParams = route.params?.email;
   const initialPercentage = route.params?.profileCompletionPercentage ?? 70;
   const userProfileFromRoute = route.params?.userProfile;
   const [profileCompletionPercentage, setProfileCompletionPercentage] =
@@ -239,11 +238,7 @@ export const TopicsPersonalizationScreen: React.FC = () => {
         }
 
         showSuccess('Profile updated successfully!');
-        const resolvedEmail =
-          emailFromParams ?? userData?.data?.user?.email ?? '';
-
         navigation.navigate('CareerPersonalization', {
-          email: resolvedEmail,
           profileCompletionPercentage:
             updatedPercentage ?? profileCompletionPercentage,
           userProfile: updatedProfile,
@@ -255,12 +250,7 @@ export const TopicsPersonalizationScreen: React.FC = () => {
   };
 
   const handleSkip = () => {
-    const resolvedEmail =
-      emailFromParams ?? userData?.data?.user?.email ?? undefined;
-
-    navigation.navigate('ProfileCompleted', {
-      email: resolvedEmail ?? undefined,
-    });
+    navigation.navigate('ProfileCompleted');
   };
 
   return (

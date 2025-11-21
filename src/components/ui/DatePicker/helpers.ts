@@ -1,201 +1,133 @@
 export interface IDaysMap {
   en: string;
-  ka: string;
-  uk: string;
 }
 
 export const daysMap: IDaysMap[] = [
   {
     en: "M",
-    ka: "ორშ",
-    uk: "П",
   },
   {
     en: "T",
-    ka: "სამ",
-    uk: "В",
   },
   {
     en: "W",
-    ka: "ოთხ",
-    uk: "С",
   },
   {
     en: "T",
-    ka: "ხუთ",
-    uk: "Ч",
   },
   {
     en: "F",
-    ka: "პარ",
-    uk: "П",
   },
   {
     en: "S",
-    ka: "შაბ",
-    uk: "С",
   },
   {
     en: "S",
-    ka: "კვ",
-    uk: "Н",
   },
 ];
 export interface IMonthMap {
   long: {
     en: string;
-    ka: string;
-    uk: string;
   };
   short: {
     en: string;
-    ka: string;
-    uk: string;
   };
 }
 export const monthMap: IMonthMap[] = [
   {
     long: {
       en: "January",
-      ka: "იანვარი",
-      uk: "Січня",
     },
     short: {
       en: "Jan",
-      ka: "იან",
-      uk: "Січ",
     },
   },
   {
     long: {
       en: "February",
-      ka: "თებერვალი",
-      uk: "Лютого",
     },
     short: {
       en: "Feb",
-      ka: "თებ",
-      uk: "Лют",
     },
   },
   {
     long: {
       en: "March",
-      ka: "მარტი",
-      uk: "Березня",
     },
     short: {
       en: "Mar",
-      ka: "მარ",
-      uk: "Бер",
     },
   },
   {
     long: {
       en: "April",
-      ka: "აპრილი",
-      uk: "Квітня",
     },
     short: {
       en: "Apr",
-      ka: "აპრ",
-      uk: "Квіт",
     },
   },
   {
     long: {
       en: "May",
-      ka: "მაისი",
-      uk: "Травня",
     },
     short: {
       en: "May",
-      ka: "მაი",
-      uk: "Трав",
     },
   },
   {
     long: {
       en: "June",
-      ka: "ივნისი",
-      uk: "Червня",
     },
     short: {
       en: "Jun",
-      ka: "ივნ",
-      uk: "Черв",
     },
   },
   {
     long: {
       en: "July",
-      ka: "ივლისი",
-      uk: "Липня",
     },
     short: {
       en: "Jul",
-      ka: "ივლ",
-      uk: "Лип",
     },
   },
   {
     long: {
       en: "August",
-      ka: "აგვისტო",
-      uk: "Серпня",
     },
     short: {
       en: "Aug",
-      ka: "აგვ",
-      uk: "Серп",
     },
   },
   {
     long: {
       en: "September",
-      ka: "სექტემბერი",
-      uk: "Вересня",
     },
     short: {
       en: "Sep",
-      ka: "სექ",
-      uk: "Вер",
     },
   },
   {
     long: {
       en: "October",
-      ka: "ოქტომბერი",
-      uk: "Жовтня",
     },
     short: {
       en: "Oct",
-      ka: "ოქტ",
-      uk: "Жовт",
     },
   },
   {
     long: {
       en: "November",
-      ka: "ნოემბერი",
-      uk: "Листопада",
     },
     short: {
       en: "Nov",
-      ka: "ნოე",
-      uk: "Лист",
     },
   },
   {
     long: {
       en: "December",
-      ka: "დეკემბერი",
-      uk: "Грудня",
     },
     short: {
       en: "Dec",
-      ka: "დეკ",
-      uk: "Груд",
     },
   },
 ];
@@ -229,7 +161,7 @@ function getDayDetails(args: any) {
     day,
     month,
     timestamp,
-    dayString: daysMap[day],
+    dayString: daysMap[day].en,
   };
 }
 

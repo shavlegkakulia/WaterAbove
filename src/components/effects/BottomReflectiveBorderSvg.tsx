@@ -1,3 +1,4 @@
+import { StyleProp, ViewStyle } from 'react-native';
 import Svg, {
   Defs,
   LinearGradient,
@@ -15,6 +16,7 @@ type SvgProps = {
   height?: number;
   radius?: number;
   color?: string;
+  style?: StyleProp<ViewStyle>;
 };
 
 export function BottomReflectiveBorderSvg({
@@ -22,6 +24,7 @@ export function BottomReflectiveBorderSvg({
   height = 20,
   radius = 36,
   color = '#7d828a',
+  style,
 }: SvgProps) {
   const r = radius;
   const glowStripH = Math.max(34, Math.floor(r * 1.4));
@@ -38,7 +41,7 @@ export function BottomReflectiveBorderSvg({
     `;
 
   return (
-    <Svg width={width} height={svgHeight}>
+    <Svg width={width} height={svgHeight} style={style}>
       <Defs>
         <LinearGradient id="fadeXBottom" x1="0" y1="0" x2="1" y2="0">
           <Stop offset="0" stopColor="#fff" stopOpacity="0" />

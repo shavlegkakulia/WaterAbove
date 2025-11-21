@@ -15,9 +15,10 @@ export const colors = {
   accentDark: '#6B21A8',
 
   // Status Colors
-  success: '#4ECDC4', // Teal/Turquoise
+  success: '#46C2A3', // Updated to match design
   successLight: '#7EDDD6',
   successDark: '#3BA69F',
+  successTeal: '#4ECDC4', // Original teal/turquoise
 
   error: '#FF6B6B', // Coral red
   errorLight: '#FF8E8E',
@@ -52,6 +53,8 @@ export const colors = {
   backgroundDark: '#0F172A',
   backgroundCard: '#1E293B',
   backgroundInput: '#2F3847',
+  backgroundLessonItem: 'rgba(47, 56, 71, 0.41)', // #2f384768
+  backgroundLessonItemLocked: 'rgba(11, 14, 18, 0.32)',
 
   // Text Colors
   textPrimary: '#FFFFFF',

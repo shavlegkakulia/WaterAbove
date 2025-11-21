@@ -95,11 +95,18 @@ export {
   CheckCircle,
   XCircle,
   Calendar,
+  Lock,
 
   // Files
   File,
   FileText,
   Folder,
   FolderOpen,
+
+  // Custom/Additional
+  ChartNoAxesColumn,
+  BookOpen,
+  AudioWaveform,
+  LibraryBig,
 } from 'lucide-react-native';
 

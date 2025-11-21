@@ -7,9 +7,10 @@ import {
   KeyboardAvoidingView,
   ViewStyle,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { spacing, KEYBOARD_AVOIDING_VIEW_BEHAVIOR } from '@/theme';
-import bgImage from '@/assets/images/bgbg.png';
+import backgroundImage from '@/assets/images/background.png';
 
 export interface AuthScreenWrapperProps {
   children: React.ReactNode;
@@ -23,6 +24,8 @@ export interface AuthScreenWrapperProps {
   scrollContentStyle?: ViewStyle;
   /** Whether to show vertical scroll indicator */
   showsVerticalScrollIndicator?: boolean;
+  /** Background color. If provided, uses gradient background instead of background image */
+  bgColor?: string;
 }
 
 export const AuthScreenWrapper: React.FC<AuthScreenWrapperProps> = ({
@@ -32,15 +35,58 @@ export const AuthScreenWrapper: React.FC<AuthScreenWrapperProps> = ({
   contentContainerStyle,
   scrollContentStyle,
   showsVerticalScrollIndicator = false,
+  bgColor,
 }) => {
   const insets = useSafeAreaInsets();
 
-  const content = (
-    <ImageBackground
-      source={bgImage}
+  // Gradient colors based on the design (dark blue-gray gradient)
+  const gradientColors = ['#1A2B3C', '#0B2539', '#05131E'];
+
+  const content = bgColor ? (
+    <LinearGradient
+      colors={gradientColors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
       style={styles.background}
-      resizeMode="cover"
     >
+      {withScrollView ? (
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            scrollContentStyle,
+            {
+              paddingTop: insets.top,
+              paddingBottom: insets.bottom,
+            },
+          ]}
+          showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={[styles.container, contentContainerStyle]}>
+            {children}
+          </View>
+        </ScrollView>
+      ) : (
+        <View
+          style={[
+            styles.container,
+            contentContainerStyle,
+            {
+              paddingTop: insets.top,
+              paddingBottom: insets.bottom,
+            },
+          ]}
+        >
+          {children}
+        </View>
+      )}
+    </LinearGradient>
+  ) : (
+              <ImageBackground
+                source={backgroundImage}
+                style={styles.background}
+                resizeMode="cover"
+              >
       {withScrollView ? (
         <ScrollView
           contentContainerStyle={[

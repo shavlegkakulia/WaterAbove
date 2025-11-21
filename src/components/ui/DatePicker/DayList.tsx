@@ -7,7 +7,7 @@ import { moderateScale } from "@/utils";
 export type TMonthDetails = {
   date: number;
   day: number;
-  dayString: string | IDaysMap;
+  dayString: string;
   month: number;
   timestamp: number;
 };
@@ -36,7 +36,7 @@ export default function DayList({
         {daysMap.map((day: any, i: number) => (
           <View key={i} style={styleSheet.dayBtn}>
             <Text style={[styleSheet.dayText, { fontWeight: "500" }]}>
-              {day['en']}
+              {day.en}
             </Text>
           </View>
         ))}

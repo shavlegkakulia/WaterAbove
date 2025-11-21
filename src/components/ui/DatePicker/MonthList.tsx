@@ -49,7 +49,7 @@ export default function MonthList({
           onPress={() => onSelectMonth(index)}
         >
           <Text style={styles.monthLabel}>
-            {item.long['en']}
+            {item.long.en}
           </Text>
         </TouchableOpacity>
       ))}
