@@ -29,7 +29,7 @@ import {
   updateLessonNoteAtom,
 } from '@/store/atoms/courseProgressAtoms';
 
-const VIDEO_ASPECT = 199 / 112; // იგივე ფიგმას პროპორცია
+const VIDEO_ASPECT = 199 / 112; 
 
 export const LessonDetailVideoScreen: React.FC = () => {
   const navigation = useNavigation<DrawerNavigationProp<RootStackParamList, 'LessonDetailVideo'>>();
