@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { DrawerContentComponentProps } from '@react-navigation/drawer';
+import { useAtomValue } from 'jotai';
 import { Icon } from '@/components/ui/Icon';
 import { CompletedCircle } from '@/components/ui/CompletedCircle';
 import { Text, CircularProgressBar, Button } from '@/components';
 import { colors, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
+import { coursesData } from '@/data/courses';
+import { 
+  getWatchedLessonsCountAtom,
+  hasWatchedLessonsAtom,
+  isCourseCompletedAtom,
+} from '@/store/atoms/courseProgressAtoms';
 
 interface CourseItem {
   id: string;
@@ -20,19 +27,20 @@ interface UniversityActivityPanelProps {
   navigation?: DrawerContentComponentProps['navigation'];
 }
 
-const defaultCourses: CourseItem[] = [
-  { id: '1', title: 'Course Title', status: 'in-progress', progress: 80 },
-  { id: '2', title: 'Course Title', status: 'completed' },
-  { id: '3', title: 'Course Title', status: 'not-started' },
-  { id: '4', title: 'Course Title', status: 'not-started' },
-];
-
 export const UniversityActivityPanel: React.FC<
   UniversityActivityPanelProps
-> = ({ courses = defaultCourses, navigation }) => {
+> = ({ courses, navigation }) => {
   if (!navigation) {
     return null;
   }
+
+  // Use courses from prop or default from coursesData
+  const displayCourses = courses || coursesData.map(course => ({
+    id: course.id,
+    title: course.title,
+    status: course.status,
+    progress: course.progress,
+  }));
 
   const handleCoursePress = (course: CourseItem) => {
     navigation.dispatch(
@@ -47,12 +55,26 @@ export const UniversityActivityPanel: React.FC<
     );
   };
 
-  const renderCourseItem = (course: CourseItem) => {
+  // Component for individual course item
+  const CourseItemComponent: React.FC<{course: CourseItem; onPress: (course: CourseItem) => void}> = ({course, onPress}) => {
+    // Get course data from coursesData
+    const courseData = useMemo(() => coursesData.find(c => c.id === course.id), [course.id]);
+    const totalLessons = courseData?.lessons.length || 0;
+    
+    // Get progress from Jotai state
+    const watchedCount = useAtomValue(useMemo(() => getWatchedLessonsCountAtom(course.id), [course.id]));
+    const hasWatched = useAtomValue(useMemo(() => hasWatchedLessonsAtom(course.id), [course.id]));
+    const isCompleted = useAtomValue(useMemo(() => isCourseCompletedAtom(course.id, totalLessons), [course.id, totalLessons]));
+    
+    // Calculate progress percentage
+    const progressPercentage = totalLessons > 0 
+      ? Math.round((watchedCount / totalLessons) * 100)
+      : 0;
+
     return (
       <TouchableOpacity
-        key={course.id}
         style={styles.courseItem}
-        onPress={() => handleCoursePress(course)}
+        onPress={() => onPress(course)}
         activeOpacity={0.7}
       >
         <Text
@@ -63,9 +85,19 @@ export const UniversityActivityPanel: React.FC<
           {course.title}
         </Text>
         <View style={styles.courseAction}>
-          {course.status === 'in-progress' && course.progress !== undefined && (
+          {isCompleted ? (
+            <CompletedCircle
+              width={24}
+              height={24}
+              borderColor={colors.success}
+              borderWidth={2}
+              strokeWidth={2}
+              strokeColor={colors.success}
+              iconSize={12}
+            />
+          ) : hasWatched && progressPercentage > 0 ? (
             <CircularProgressBar
-              progress={course.progress}
+              progress={progressPercentage}
               size={moderateScale(42)}
               strokeWidth={moderateScale(5)}
               gradientColors={[
@@ -76,27 +108,15 @@ export const UniversityActivityPanel: React.FC<
               unfilledColor={colors.gray700}
               textColor={colors.white}
               textPosition="inside"
-              insideText={`${Math.round(course.progress)}%`}
+              insideText={`${progressPercentage}%`}
               textStyle={styles.progressText}
             />
-          )}
-          {course.status === 'completed' && (
-            <CompletedCircle
-              width={24}
-              height={24}
-              borderColor={colors.success}
-              borderWidth={2}
-              strokeWidth={2}
-              strokeColor={colors.success}
-              iconSize={12}
-            />
-          )}
-          {course.status === 'not-started' && (
+          ) : (
             <Button
               title="Start"
               variant="outline"
               size="small"
-              onPress={() => {}}
+              onPress={() => onPress(course)}
               containerStyle={styles.startButton}
               textStyle={styles.startButtonText}
             />
@@ -126,7 +146,15 @@ export const UniversityActivityPanel: React.FC<
       </View>
 
       {/* Course List */}
-      <View style={styles.courseList}>{courses.map(renderCourseItem)}</View>
+      <View style={styles.courseList}>
+        {displayCourses.map(course => (
+          <CourseItemComponent 
+            key={course.id} 
+            course={course} 
+            onPress={handleCoursePress} 
+          />
+        ))}
+      </View>
     </View>
   );
 };

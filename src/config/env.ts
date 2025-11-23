@@ -31,6 +31,9 @@ export interface Environment {
   ENABLE_ANALYTICS: boolean;
   ENABLE_CRASH_REPORTING: boolean;
   ENABLE_DEV_TOOLS: boolean;
+  
+  // Backend Connection (temporarily disabled)
+  ENABLE_BACKEND: boolean;
 }
 
 /**
@@ -60,6 +63,9 @@ export const env: Environment = {
   ENABLE_ANALYTICS: parseBoolean(Config.ENABLE_ANALYTICS),
   ENABLE_CRASH_REPORTING: parseBoolean(Config.ENABLE_CRASH_REPORTING),
   ENABLE_DEV_TOOLS: parseBoolean(Config.ENABLE_DEV_TOOLS) || __DEV__,
+  
+  // Backend Connection (temporarily disabled)
+  ENABLE_BACKEND: parseBoolean(Config.ENABLE_BACKEND) || false,
 };
 
 /**

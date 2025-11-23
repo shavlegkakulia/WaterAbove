@@ -57,9 +57,12 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
+      // TODO: Temporarily disabled - backend disconnected
+      // Logout functionality disabled
       await logoutMutation.mutateAsync();
     } catch (error) {
-      console.error('Logout error:', error);
+      // Silently handle logout errors - backend is disabled
+      console.log('[useAuth] Logout skipped - backend disabled');
     }
   };
 

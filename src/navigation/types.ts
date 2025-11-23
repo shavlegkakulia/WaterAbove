@@ -21,7 +21,7 @@ export type RootStackParamList = {
   PasswordUpdatedSuccess: undefined;
   ArchiveHome: undefined;
   CourseDetail: { courseId?: string; courseTitle?: string; progress?: number };
-  LessonDetailVideo: { lessonId?: string; lessonTitle?: string; progress?: number };
+  LessonDetailVideo: { lessonId?: string; lessonTitle?: string; courseId?: string; progress?: number };
   // Add more screens here as you build them
 };
 

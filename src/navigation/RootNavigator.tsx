@@ -33,7 +33,7 @@ export const RootNavigator: React.FC = () => {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
-        initialRouteName="Initializing"
+        initialRouteName="ArchiveHome"
         screenOptions={{
           headerShown: false,
           contentStyle: {backgroundColor: 'transparent'},

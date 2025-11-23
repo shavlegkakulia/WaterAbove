@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { BlurView } from '@react-native-community/blur';
+import { useAtomValue } from 'jotai';
 import { Icon } from '@/components/ui/Icon';
 import {
   Text,
@@ -15,67 +16,127 @@ import { colors, spacing, borderRadius } from '@/theme';
 import { moderateScale, isIOS } from '@/utils';
 import { RootStackParamList } from '@/navigation/types';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { getCourseById } from '@/data/courses';
 import type { Lesson } from '@/types/lesson';
+import { 
+  isLessonWatchedAtom,
+  getWatchedLessonsCountAtom,
+  isCourseCompletedAtom,
+} from '@/store/atoms/courseProgressAtoms';
 
+// Component for individual lesson item
+const LessonItem: React.FC<{
+  lesson: Lesson;
+  courseId: string;
+  navigation: DrawerNavigationProp<RootStackParamList, 'CourseDetail'>;
+}> = ({ lesson, courseId, navigation }) => {
+  const isLessonWatched = useAtomValue(useMemo(() => isLessonWatchedAtom(courseId, lesson.id), [courseId, lesson.id]));
+
+  return (
+    <View style={[styles.lessonItem, lesson.locked && styles.lessonItemLocked]}>
+      {lesson.locked && isIOS ? (
+        <BlurView
+          style={styles.blurOverlay}
+          blurType="dark"
+          blurAmount={1}
+        />
+      ) : lesson.locked ? (
+        <View style={styles.blurOverlayAndroid} />
+      ) : null}
+      <TouchableOpacity
+        style={[
+          styles.lessonCard,
+          lesson.locked && styles.lessonCardLocked,
+        ]}
+        disabled={lesson.locked}
+        onPress={() => {
+          if (!lesson.locked) {
+            navigation.navigate('LessonDetailVideo', {
+              lessonId: lesson.id,
+              lessonTitle: lesson.title,
+              courseId: courseId,
+            });
+          }
+        }}
+      >
+        <View style={styles.lessonCardContent}>
+          <View style={styles.lessonCardHeader}>
+            <Text variant="body16Regular" color="textWhiteWA">
+              {lesson.title}
+            </Text>
+            {isLessonWatched && (
+              <CompletedCircle
+                width={16}
+                height={16}
+                borderColor={colors.success}
+                borderWidth={2}
+                strokeWidth={5}
+                strokeColor={colors.success}
+                iconSize={8}
+              />
+            )}
+            {lesson.duration && (
+              <Text variant="paragraph14Bold" color="textWhiteWA">
+                {lesson.duration}
+              </Text>
+            )}
+          </View>
+          <Text variant="body16Regular" color="textWhiteWA">
+            {lesson.subtitle}
+          </Text>
+        </View>
+      </TouchableOpacity>
+      {lesson.locked && (
+        <View style={styles.lessonLockedIcon}>
+          <Icon
+            name="Lock"
+            size={moderateScale(24)}
+            color={colors.textWhiteWA}
+          />
+        </View>
+      )}
+    </View>
+  );
+};
 
 export const CourseDetailScreen: React.FC = () => {
   const navigation = useNavigation<DrawerNavigationProp<RootStackParamList, 'CourseDetail'>>();
   const route = useRoute<RouteProp<RootStackParamList, 'CourseDetail'>>();
-  const { progress = 75 } =
-    route.params || {};
+  const { courseId = '1' } = route.params || {};
 
-  const lessons: Lesson[] = [
-    {
-      id: '1',
-      type: 'lesson',
-      title: 'Lesson 1',
-      subtitle: 'Numerology Blueprint',
-      duration: '23:00',
-      completed: true,
-      time: '23:00',
-    },
-    {
-      id: '2',
-      type: 'accountability',
-      title: 'Accountability Task',
-      subtitle: 'Numerology Blueprint',
-      completed: true,
-    },
-    {
-      id: '3',
-      type: 'lesson',
-      title: 'Lesson 2',
-      subtitle: 'Numerology Blueprint',
-      duration: '23:00',
-      completed: true,
-      time: '23:00',
-    },
-    {
-      id: '4',
-      type: 'accountability',
-      title: 'Accountability Task',
-      subtitle: 'Numerology Blueprint',
-      completed: true,
-    },
-    {
-      id: '5',
-      type: 'lesson',
-      title: 'Lesson 1',
-      subtitle: 'Numerology Blueprint',
-      duration: '23:00',
-      completed: false,
-      locked: false,
-    },
-    {
-      id: '6',
-      type: 'lesson',
-      title: 'Lesson 3',
-      subtitle: 'Numerology Blueprint',
-      duration: '23:00',
-      completed: false,
-      locked: true,
-    },
-  ];
+  // Load course from mock data
+  const course = useMemo(() => getCourseById(courseId), [courseId]);
+  const lessons = course?.lessons || [];
+  const courseTitle = course?.title || 'Course';
+  const totalLessons = lessons.length;
+
+  // Get progress from Jotai state
+  const watchedCount = useAtomValue(useMemo(() => getWatchedLessonsCountAtom(courseId), [courseId]));
+  const progress = totalLessons > 0 
+    ? Math.round((watchedCount / totalLessons) * 100)
+    : 0;
+  const isCompleted = useAtomValue(useMemo(() => isCourseCompletedAtom(courseId, totalLessons), [courseId, totalLessons]));
+
+  // Calculate total duration in a better format
+  const totalDurationMinutes = lessons
+    .filter(l => l.duration)
+    .reduce((total, lesson) => {
+      const duration = lesson.duration?.split(':') || [];
+      const minutes = parseInt(duration[0] || '0', 10);
+      const seconds = parseInt(duration[1] || '0', 10);
+      return total + minutes + seconds / 60;
+    }, 0);
+
+  const formatDuration = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.floor(minutes % 60);
+    if (hours > 0) {
+      return `${hours}:${mins.toString().padStart(2, '0')}`;
+    }
+    return `${mins}`;
+  };
+
+  const canGoBack = navigation.canGoBack();
 
   return (
     <AuthScreenWrapper withScrollView={false} bgColor={colors.backgroundDark}>
@@ -88,13 +149,15 @@ export const CourseDetailScreen: React.FC = () => {
         {/* Header Section */}
         <View style={styles.headerSection}>
           <View style={styles.headerTop}>
-            <BackButton />
+            {canGoBack && (
+              <BackButton />
+            )}
             <Text
               variant="heading20Bold"
               color="success"
               style={styles.courseTitle}
             >
-              9-Week Accelerator
+              {courseTitle}
             </Text>
           </View>
 
@@ -102,8 +165,8 @@ export const CourseDetailScreen: React.FC = () => {
             <Text variant="heading20Bold" color="success">
               Lessons
             </Text>
-            <Text variant="body16Regular" color="warning">
-              In-Progress
+            <Text variant="body16Regular" color={isCompleted ? 'success' : progress > 0 ? 'warning' : 'textSecondary'}>
+              {isCompleted ? 'Completed' : progress > 0 ? 'In-Progress' : 'Not Started'}
             </Text>
           </View>
 
@@ -136,7 +199,7 @@ export const CourseDetailScreen: React.FC = () => {
                 color="success"
                 style={styles.sectionTitle}
               >
-                The Observer
+                {courseTitle}
               </Text>
               <Icon
                 name="ChevronUp"
@@ -145,74 +208,18 @@ export const CourseDetailScreen: React.FC = () => {
               />
             </View>
             <Text variant="body16Regular" color="success">
-              23:39
+              {formatDuration(totalDurationMinutes)}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.timelineContainer}>
             {lessons.map(lesson => (
-              <View key={lesson.id} style={[styles.lessonItem, lesson.locked && styles.lessonItemLocked]}>
-                {lesson.locked && isIOS ? (
-                  <BlurView
-                    style={styles.blurOverlay}
-                    blurType="dark"
-                    blurAmount={1}
-                  />
-                ) : lesson.locked ? (
-                  <View style={styles.blurOverlayAndroid} />
-                ) : null}
-                <TouchableOpacity
-                  style={[
-                    styles.lessonCard,
-                    lesson.locked && styles.lessonCardLocked,
-                  ]}
-                  disabled={lesson.locked}
-                  onPress={() => {
-                    if (!lesson.locked && lesson.type === 'lesson') {
-                      navigation.navigate('LessonDetailVideo', {
-                        lessonId: lesson.id,
-                        lessonTitle: lesson.title,
-                      });
-                    }
-                  }}
-                >
-                  <View style={styles.lessonCardContent}>
-                    <View style={styles.lessonCardHeader}>
-                      <Text variant="body16Regular" color="textWhiteWA">
-                        {lesson.title}
-                      </Text>
-                      {lesson.completed && (
-                        <CompletedCircle
-                          width={16}
-                          height={16}
-                          borderColor={colors.success}
-                          borderWidth={2}
-                          strokeWidth={5}
-                          strokeColor={colors.success}
-                          iconSize={8}
-                        />
-                      )}
-                      {lesson.duration && (
-                        <Text variant="paragraph14Bold" color="textWhiteWA">
-                          {lesson.duration}
-                        </Text>
-                      )}
-                    </View>
-                    <Text variant="body16Regular" color="textWhiteWA">
-                      {lesson.subtitle}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                {lesson.locked && (
-                  <View style={styles.lessonLockedIcon}>
-                    <Icon
-                      name="Lock"
-                      size={moderateScale(24)}
-                      color={colors.textWhiteWA}
-                    />
-                  </View>
-                )}
-              </View>
+              <LessonItem
+                key={lesson.id}
+                lesson={lesson}
+                courseId={courseId}
+                navigation={navigation}
+              />
             ))}
           </View>
         </View>

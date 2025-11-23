@@ -1,5 +1,6 @@
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../endpoints';
+import { env } from '@/config';
 import type {
   LoginRequest,
   LoginResponse,
@@ -51,8 +52,15 @@ export const authService = {
 
   /**
    * Logout current user
+   * TODO: Temporarily disabled - backend disconnected
    */
   logout: async (data?: LogoutRequest): Promise<void> => {
+    // Backend connection temporarily disabled
+    if (!env.ENABLE_BACKEND) {
+      console.log('[Auth Service] Logout skipped - backend disabled');
+      return Promise.resolve();
+    }
+    
     await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, data || { data: {} }, {
       headers: {
         _skipTokenRefresh: true, // Skip token refresh for this auth endpoint

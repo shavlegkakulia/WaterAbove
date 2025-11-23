@@ -1,5 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { env } from '@/config';
+
+// Backend connection flag - temporarily disable all API calls
+const BACKEND_DISABLED = !env.ENABLE_BACKEND;
 import { getDefaultStore } from 'jotai';
 import {
   addToastAtom,
@@ -74,6 +77,12 @@ let refreshStarted = false;
  */
 apiClient.interceptors.request.use(
   async (config: AxiosRequestConfig): Promise<any> => {
+    // Backend connection temporarily disabled
+    if (BACKEND_DISABLED) {
+      console.log('[API Client] Backend disabled - skipping request:', config.url);
+      return Promise.reject(new Error('Backend connection is temporarily disabled'));
+    }
+    
     // Ensure headers object exists
     if (!config.headers) {
       config.headers = {};

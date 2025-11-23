@@ -38,6 +38,7 @@ const BootstrapAuth: React.FC = () => {
 
   // Listen for navigation ready state
   React.useEffect(() => {
+    return;
     const checkReady = () => {
       if (navigationRef.current?.isReady()) {
         setNavReady(true);

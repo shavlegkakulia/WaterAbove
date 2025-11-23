@@ -10,6 +10,7 @@ const Drawer = createDrawerNavigator<RootStackParamList>();
 export const MainDrawerNavigator: React.FC = () => {
   return (
     <Drawer.Navigator
+      initialRouteName="CourseDetail"
       drawerContent={(props) => <DrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
@@ -21,8 +22,12 @@ export const MainDrawerNavigator: React.FC = () => {
         overlayColor: 'rgba(0, 0, 0, 0.7)',
       }}
     >
-      <Drawer.Screen name="ArchiveHome" component={ArchiveHomeScreen} />
-      <Drawer.Screen name="CourseDetail" component={CourseDetailScreen} />
+      {/* <Drawer.Screen name="ArchiveHome" component={ArchiveHomeScreen} /> */}
+      <Drawer.Screen 
+        name="CourseDetail" 
+        component={CourseDetailScreen}
+        initialParams={{ courseId: '1' }}
+      />
       <Drawer.Screen name="LessonDetailVideo" component={LessonDetailVideoScreen} />
     </Drawer.Navigator>
   );

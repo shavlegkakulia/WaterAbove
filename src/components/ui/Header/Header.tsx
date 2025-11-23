@@ -1,13 +1,18 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { Icon } from '@/components/ui/Icon';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { userAtom } from '@/store/atoms';
 import { colors, spacing } from '@/theme';
 import { moderateScale } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
 import { env } from '@/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { 
+  courseProgressAtom, 
+  lessonNotesAtom 
+} from '@/store/atoms/courseProgressAtoms';
 
 export interface HeaderProps {
   /** Optional custom menu icon press handler */
@@ -22,7 +27,9 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const navigation = useNavigation();
   const user = useAtomValue(userAtom);
-  console.log(user);
+  const setCourseProgress = useSetAtom(courseProgressAtom);
+  const setLessonNotes = useSetAtom(lessonNotesAtom);
+  
   const handleMenuPress = () => {
     if (onMenuPress) {
       onMenuPress();
@@ -31,12 +38,47 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const clearStorage = async () => {
+    try {
+      // Clear course progress
+      setCourseProgress({});
+      
+      // Clear lesson notes
+      setLessonNotes({});
+      
+      // Clear all AsyncStorage keys related to course progress
+      await AsyncStorage.multiRemove([
+        'course_progress',
+        'lessonNotes',
+      ]);
+      
+      Alert.alert('Success', 'Storage cleared successfully');
+    } catch (error) {
+      console.error('Error clearing storage:', error);
+      Alert.alert('Error', 'Failed to clear storage');
+    }
+  };
+
   const handleProfilePress = () => {
     if (onProfilePress) {
       onProfilePress();
     } else {
-      // Default: open drawer on profile press too
-      navigation.dispatch(DrawerActions.openDrawer());
+      // Default: show alert to confirm storage clear
+      Alert.alert(
+        'Clear Storage',
+        'Are you sure you want to clear all course progress and notes? This action cannot be undone.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Clear',
+            style: 'destructive',
+            onPress: clearStorage,
+          },
+        ]
+      );
     }
   };
 

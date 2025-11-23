@@ -152,7 +152,12 @@ export const useLogoutMutation = () => {
   const setIsAuthenticated = useSetAtom(isAuthenticatedAtom);
 
   return useMutation({
-    mutationFn: () => authService.logout(),
+    mutationFn: async () => {
+      // TODO: Temporarily disabled - backend disconnected
+      // Logout functionality disabled - backend connection off
+      // await authService.logout();
+      return Promise.resolve();
+    },
     onSuccess: () => {
       // Clear Jotai state
       setUser(null);
